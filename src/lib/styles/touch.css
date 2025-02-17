@@ -1,0 +1,8 @@
+html {
+  touch-action: pan-y pinch-zoom; /* Only allow vertical scrolling and pinch zoom */
+  overscroll-behavior: none; /* Prevent bounce/rubber-band effect */
+}
+
+body {
+  overscroll-behavior: none; /* Ensure it's applied to body too */
+}

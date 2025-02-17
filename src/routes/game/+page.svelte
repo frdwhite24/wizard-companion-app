@@ -1,0 +1,466 @@
+<script lang="ts">
+  import { onMount, onDestroy } from 'svelte'
+  import { goto } from '$app/navigation'
+  import type { GameState } from '$lib/storage/gameState'
+  import {
+    clearGameState,
+    getGameState,
+    setGameState,
+  } from '$lib/storage/gameState'
+  import DealStage from './DealStage.svelte'
+  import GuessStage from './GuessStage.svelte'
+  import PlayStage from './PlayStage.svelte'
+  import ResultsStage from './ResultsStage.svelte'
+  import ScoreboardStage from './ScoreboardStage.svelte'
+  import { page } from '$app/stores'
+  import { saveGameToHistory } from '$lib/gameHistory'
+
+  let gameState: GameState | null = null
+
+  function initializeRound() {
+    if (!gameState) return
+
+    if (!gameState.rounds[gameState.currentRound - 1]) {
+      gameState.rounds[gameState.currentRound - 1] = {
+        guesses: Object.fromEntries(gameState.players.map((p) => [p, 0])),
+        tricks: Object.fromEntries(gameState.players.map((p) => [p, 0])),
+        scores: {},
+      }
+      setGameState(gameState)
+    }
+  }
+
+  function updateURL(round: number, stage: GameState['stage']) {
+    goto(`?round=${round}&stage=${stage}`, {
+      keepFocus: true,
+      replaceState: false,
+    })
+  }
+
+  function handlePopState() {
+    if (!gameState) return
+
+    const urlRound = parseInt($page.url.searchParams.get('round') ?? '1')
+    const urlStage =
+      ($page.url.searchParams.get('stage') as GameState['stage']) ?? 'deal'
+
+    // Going back from first stage of first round -> go home
+    if (
+      urlRound === 1 &&
+      urlStage === 'deal' &&
+      (gameState.currentRound > 1 || gameState.stage !== 'deal')
+    ) {
+      goto('/')
+      return
+    }
+
+    // Calculate previous stage/round
+    let newRound = gameState.currentRound
+    let newStage = gameState.stage
+
+    if (urlStage !== gameState.stage) {
+      // Moving backwards within the same round
+      const stages: GameState['stage'][] = ['deal', 'guess', 'play', 'result']
+      const currentIndex = stages.indexOf(gameState.stage)
+      const targetIndex = stages.indexOf(urlStage)
+
+      if (targetIndex < currentIndex) {
+        newStage = urlStage
+      }
+    }
+
+    if (urlRound !== gameState.currentRound) {
+      // Moving to previous round
+      if (urlRound < gameState.currentRound) {
+        newRound = urlRound
+        newStage = 'result' // Go to results of previous round
+      }
+    }
+
+    gameState = {
+      ...gameState,
+      currentRound: newRound,
+      stage: newStage,
+    }
+    setGameState(gameState)
+  }
+
+  onMount(() => {
+    gameState = getGameState()
+    if (!gameState) {
+      goto('/create-game')
+      return
+    }
+
+    // Validate loaded state has all required properties
+    if (
+      !gameState.players?.length ||
+      !gameState.totalRounds ||
+      !gameState.stage ||
+      !gameState.rounds
+    ) {
+      console.error('Invalid game state loaded')
+      goto('/create-game')
+      return
+    }
+
+    // Initialize round data if needed
+    initializeRound()
+
+    // Add popstate listener
+    window.addEventListener('popstate', handlePopState)
+  })
+
+  onDestroy(() => {
+    window.removeEventListener('popstate', handlePopState)
+  })
+
+  function getButtonText(
+    stage: GameState['stage'],
+    isFinalRound: boolean,
+  ): string {
+    switch (stage) {
+      case 'deal':
+        return 'Start guessing'
+      case 'guess':
+        return 'Start playing'
+      case 'play':
+        return 'Enter results'
+      case 'result':
+        return isFinalRound ? 'See final scores!' : 'See scoreboard'
+      case 'scoreboard':
+        return isFinalRound ? 'Rematch' : 'Play next round'
+    }
+  }
+
+  function canProceed(): boolean {
+    if (!gameState) return false
+
+    switch (gameState.stage) {
+      case 'deal':
+        return true
+      case 'guess': {
+        const currentRound = gameState.rounds[gameState.currentRound - 1]
+        if (!currentRound) return false
+
+        // All players must have guessed
+        const allGuessed = gameState.players.every(
+          (p) => typeof currentRound.guesses[p] === 'number',
+        )
+
+        // Total guesses must not equal number of cards
+        const totalGuesses = Object.values(currentRound.guesses).reduce(
+          (sum, g) => sum + g,
+          0,
+        )
+
+        return allGuessed && totalGuesses !== gameState.currentRound
+      }
+      case 'play':
+        return true
+      case 'result': {
+        const currentRound = gameState.rounds[gameState.currentRound - 1]
+        if (!currentRound) {
+          return false
+        }
+
+        // All players must have tricks recorded
+        const allRecorded = gameState.players.every(
+          (p) => typeof currentRound.tricks[p] === 'number',
+        )
+
+        // Total tricks must equal number of cards
+        const totalTricks = Object.values(currentRound.tricks).reduce(
+          (sum, t) => sum + t,
+          0,
+        )
+
+        return allRecorded && totalTricks === gameState.currentRound
+      }
+      case 'scoreboard':
+        return true
+    }
+  }
+
+  function proceed(): void {
+    if (!gameState) return
+
+    switch (gameState.stage) {
+      case 'deal':
+        initializeRound()
+        gameState.stage = 'guess'
+        updateURL(gameState.currentRound, 'guess')
+        break
+      case 'guess':
+        gameState.stage = 'play'
+        updateURL(gameState.currentRound, 'play')
+        break
+      case 'play':
+        gameState.stage = 'result'
+        updateURL(gameState.currentRound, 'result')
+        break
+      case 'result':
+        if (gameState.currentRound === gameState.totalRounds) {
+          const completedGame = { ...gameState, completed: true }
+          setGameState(completedGame)
+          saveGameToHistory(completedGame)
+        }
+        gameState.stage = 'scoreboard'
+        updateURL(gameState.currentRound, 'scoreboard')
+        break
+      case 'scoreboard':
+        if (gameState.currentRound === gameState.totalRounds) {
+          handleRematch()
+        } else {
+          gameState.currentRound += 1
+          gameState.stage = 'deal'
+          updateURL(gameState.currentRound, 'deal')
+        }
+        break
+    }
+
+    gameState = { ...gameState }
+    setGameState(gameState)
+  }
+
+  function handleGuessChange(player: string, value: number) {
+    if (!gameState) return
+
+    const currentRound = gameState.rounds[gameState.currentRound - 1]
+    if (!currentRound) return
+
+    if (value >= 0) {
+      currentRound.guesses = {
+        ...currentRound.guesses,
+        [player]: value,
+      }
+      gameState = { ...gameState }
+      setGameState(gameState)
+    }
+  }
+
+  // Create reactive references to current round data
+  let currentRound: GameState['rounds'][0] | undefined
+  let currentGuesses: Record<string, number>
+  let currentTricks: Record<string, number>
+
+  $: currentRound = gameState?.rounds[gameState.currentRound - 1]
+  $: currentGuesses = currentRound?.guesses ?? {}
+  $: currentTricks = currentRound?.tricks ?? {}
+
+  function getStageName(stage: GameState['stage']): string {
+    switch (stage) {
+      case 'deal':
+        return 'Dealing'
+      case 'guess':
+        return 'Guessing'
+      case 'play':
+        return 'Playing'
+      case 'result':
+        return 'Round Results'
+      case 'scoreboard':
+        return 'Game Summary'
+    }
+  }
+
+  $: gameProgress = gameState
+    ? (gameState.currentRound / gameState.totalRounds) * 100
+    : 0
+
+  $: stageProgress = gameState
+    ? ({ deal: 1, guess: 2, play: 3, result: 4, scoreboard: 5 }[
+        gameState.stage
+      ] /
+        5) *
+      100
+    : 0
+
+  // Add tricks state handling
+  function handleTrickChange(player: string, value: number) {
+    if (!gameState) return
+
+    const currentRound = gameState.rounds[gameState.currentRound - 1]
+    if (!currentRound) return
+
+    if (value >= 0) {
+      currentRound.tricks = {
+        ...currentRound.tricks,
+        [player]: value,
+      }
+      gameState = { ...gameState }
+      setGameState(gameState)
+    }
+  }
+
+  function handleFinishEarly() {
+    if (
+      confirm(
+        'Are you sure you want to finish the game early? This will end the game and return you to the home screen.',
+      )
+    ) {
+      if (gameState) {
+        // Mark as completed and save to history
+        const completedGame = { ...gameState, completed: true }
+        saveGameToHistory(completedGame)
+        clearGameState() // Clear the game state after saving
+        goto('/')
+      }
+    }
+  }
+
+  function handleRematch() {
+    if (gameState) {
+      // Save current game in history
+      const completedGame = { ...gameState, completed: true }
+      setGameState(completedGame)
+      saveGameToHistory(completedGame)
+
+      // Create new game with same config
+      const newGame: GameState = {
+        players: gameState.players,
+        currentRound: 1,
+        totalRounds: gameState.totalRounds,
+        stage: 'deal',
+        rounds: [],
+        lastUpdated: Date.now(),
+      }
+
+      setGameState(newGame)
+      // Use goto instead of window.location
+      goto('/game?round=1&stage=deal')
+    }
+  }
+</script>
+
+<div class="page">
+  <header class="container">
+    <div class="progress-section">
+      <progress value={gameProgress} max="100"></progress>
+      <progress value={stageProgress} max="100"></progress>
+    </div>
+    {#if gameState}
+      <small>
+        Round {gameState.currentRound} of {gameState.totalRounds} - {getStageName(
+          gameState.stage,
+        )}
+      </small>
+    {/if}
+  </header>
+
+  <main class="container">
+    {#if gameState}
+      {#if gameState.stage === 'deal'}
+        <DealStage
+          currentRound={gameState.currentRound}
+          players={gameState.players}
+        />
+      {:else if gameState.stage === 'guess'}
+        <GuessStage
+          currentRound={gameState.currentRound}
+          players={gameState.players}
+          guesses={currentGuesses}
+          onGuessChange={handleGuessChange}
+        />
+      {:else if gameState.stage === 'play'}
+        <PlayStage
+          currentRound={gameState.currentRound}
+          players={gameState.players}
+          guesses={currentGuesses}
+        />
+      {:else if gameState.stage === 'result'}
+        <ResultsStage
+          currentRound={gameState.currentRound}
+          players={gameState.players}
+          guesses={currentGuesses}
+          tricks={currentTricks}
+          rounds={gameState.rounds}
+          onTrickChange={handleTrickChange}
+          onScoreChange={(player, score) => {
+            if (gameState && currentRound) {
+              currentRound.scores[player] = score
+              gameState = { ...gameState }
+              setGameState(gameState)
+            }
+          }}
+        />
+      {:else if gameState.stage === 'scoreboard'}
+        <ScoreboardStage
+          currentRound={gameState.currentRound}
+          players={gameState.players}
+          rounds={gameState.rounds}
+        />
+      {/if}
+    {/if}
+  </main>
+
+  <footer class="container">
+    {#if gameState}
+      {#if gameState.stage === 'scoreboard'}
+        <button
+          on:click={gameState.totalRounds === gameState.currentRound
+            ? () => {
+                clearGameState() // Clear the current game
+                goto('/')
+              }
+            : handleFinishEarly}
+          class="outline"
+        >
+          {gameState.totalRounds === gameState.currentRound
+            ? 'Go to home'
+            : 'Finish game early'}
+        </button>
+      {/if}
+      <button
+        on:click={proceed}
+        disabled={!canProceed()}
+        class={gameState.stage === 'result' ||
+        (gameState.stage === 'scoreboard' &&
+          gameState.totalRounds === gameState.currentRound)
+          ? 'primary'
+          : ''}
+      >
+        {getButtonText(
+          gameState.stage,
+          gameState.totalRounds === gameState.currentRound,
+        )}
+      </button>
+    {/if}
+  </footer>
+</div>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  header,
+  footer {
+    flex-shrink: 0;
+    padding: 1rem;
+    background: var(--background-color);
+  }
+
+  main {
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  button {
+    width: 100%;
+  }
+
+  .progress-section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  footer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+</style>
