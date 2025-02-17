@@ -93,17 +93,23 @@
   }
 
   function movePlayer(index: number, direction: 'up' | 'down') {
-    const newIndex = direction === 'up' ? index - 1 : index + 1
-    if (newIndex >= 0 && newIndex < gameState.players.length) {
-      const newPlayers = [...gameState.players]
-      const temp = newPlayers[index]
-      if (temp !== undefined && newPlayers[newIndex] !== undefined) {
-        newPlayers[index] = newPlayers[newIndex]
-        newPlayers[newIndex] = temp
-        gameState.players = newPlayers
-        setCreateGameState(gameState)
-      }
+    if (!gameState) return
+
+    const newPlayers = [...gameState.players]
+    const targetIndex = direction === 'up' ? index - 1 : index + 1
+
+    // Swap players
+    const temp = newPlayers[index]
+    newPlayers[index] = newPlayers[targetIndex]
+    newPlayers[targetIndex] = temp
+
+    // Update state
+    gameState = {
+      ...gameState,
+      players: newPlayers,
+      lastUpdated: Date.now(),
     }
+    setCreateGameState(gameState)
   }
 
   function nextStep() {
@@ -152,13 +158,16 @@
   </main>
 
   <footer class="container">
-    <button
-      disabled={!canProceed}
-      on:click={gameState.step === 3 ? startGame : nextStep}
-      class={gameState.step === 3 ? 'primary' : ''}
-    >
-      {gameState.step === 3 ? 'Start game!' : 'Continue to next step'}
-    </button>
+    <div class="buttons">
+      <button class="outline" on:click={() => history.back()}> Back </button>
+      <button
+        disabled={!canProceed}
+        on:click={gameState.step === 3 ? startGame : nextStep}
+        class={gameState.step === 3 ? 'primary' : ''}
+      >
+        {gameState.step === 3 ? 'Start game!' : 'Continue'}
+      </button>
+    </div>
   </footer>
 </div>
 
@@ -187,6 +196,12 @@
 
   header {
     border-bottom: 1px solid var(--secondary);
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
   }
 
   button {

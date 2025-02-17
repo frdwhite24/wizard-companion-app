@@ -1,36 +1,30 @@
+export type CreateGameStage = 'players' | 'seating'
+
 export interface CreateGameState {
   step: number
   players: string[]
   lastUpdated: number
 }
 
-const STORAGE_KEY = 'createGameState'
-
 export function getCreateGameState(): CreateGameState | null {
+  const stored = localStorage.getItem('createGame')
+  if (!stored) return null
+
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (!stored) return null
     return JSON.parse(stored)
-  } catch (e) {
-    console.error('Failed to parse create game state:', e)
+  } catch {
     return null
   }
 }
 
-export function setCreateGameState(state: CreateGameState): void {
-  try {
-    localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        ...state,
-        lastUpdated: Date.now(),
-      }),
-    )
-  } catch (e) {
-    console.error('Failed to save create game state:', e)
+export function setCreateGameState(state: CreateGameState | null): void {
+  if (state === null) {
+    localStorage.removeItem('createGame')
+  } else {
+    localStorage.setItem('createGame', JSON.stringify(state))
   }
 }
 
 export function clearCreateGameState(): void {
-  localStorage.removeItem(STORAGE_KEY)
+  localStorage.removeItem('createGame')
 }

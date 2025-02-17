@@ -1,18 +1,28 @@
 <script lang="ts">
   import { getGameState } from '$lib/storage/gameState'
   import { getCreateGameState } from '$lib/storage/createGame'
+  import { loadGameHistory } from '$lib/gameHistory'
   import { goto } from '$app/navigation'
   import logo from '$lib/assets/logo.png'
+  import { clearCreateGameState } from '$lib/storage/createGame'
 
   $: gameInProgress = getGameState() !== null
   $: setupInProgress = getCreateGameState() !== null
+  $: gameHistory = loadGameHistory()
+  $: hasHistory = gameHistory.length > 0
 
   function startNewGame() {
+    clearCreateGameState()
     goto('/create-game')
   }
 
   function continueGame() {
-    goto('/game')
+    const gameState = getGameState()
+    if (gameState) {
+      goto(`/game?round=${gameState.currentRound}&stage=${gameState.stage}`)
+    } else {
+      goto('/game')
+    }
   }
 
   function continueSetup() {
@@ -24,11 +34,10 @@
   <main class="container">
     <img alt="The wizard card game logo" src={logo} />
     <h1>Wizard Card Game</h1>
-    <p>A helper app for playing Wizard</p>
+    <p>A companion app for playing Wizard</p>
   </main>
 
   <footer class="container">
-    <button on:click={startNewGame} class="primary">Start new game</button>
     {#if gameInProgress}
       <button class="outline" on:click={continueGame}
         >Continue previous game</button
@@ -39,6 +48,10 @@
         >Continue previous setup</button
       >
     {/if}
+    {#if hasHistory}
+      <a href="/history" role="button" class="outline">Game History</a>
+    {/if}
+    <button on:click={startNewGame} class="primary">Start new game</button>
   </footer>
 </div>
 

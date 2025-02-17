@@ -117,8 +117,11 @@
 
   function getButtonText(
     stage: GameState['stage'],
-    isFinalRound: boolean,
+    totalRounds: number,
+    currentRound: number,
   ): string {
+    const isFinalRound = totalRounds === currentRound
+    const isSecondToLastRound = totalRounds - 1 === currentRound
     switch (stage) {
       case 'deal':
         return 'Start guessing'
@@ -129,7 +132,11 @@
       case 'result':
         return isFinalRound ? 'See final scores!' : 'See scoreboard'
       case 'scoreboard':
-        return isFinalRound ? 'Rematch' : 'Play next round'
+        return isFinalRound
+          ? 'Rematch'
+          : isSecondToLastRound
+            ? 'Play final round'
+            : 'Play next round'
     }
   }
 
@@ -295,7 +302,7 @@
   function handleFinishEarly() {
     if (
       confirm(
-        'Are you sure you want to finish the game early? This will end the game and return you to the home screen.',
+        'Are you sure you want to finish the game early? This will end and save the current game. You will be returned to the home screen.',
       )
     ) {
       if (gameState) {
@@ -312,7 +319,6 @@
     if (gameState) {
       // Save current game in history
       const completedGame = { ...gameState, completed: true }
-      setGameState(completedGame)
       saveGameToHistory(completedGame)
 
       // Create new game with same config
@@ -325,10 +331,41 @@
         lastUpdated: Date.now(),
       }
 
+      // Update both state and URL synchronously
       setGameState(newGame)
-      // Use goto instead of window.location
-      goto('/game?round=1&stage=deal')
+      goto('/game?round=1&stage=deal', { replaceState: true })
     }
+  }
+
+  function handleBack() {
+    if (!gameState) return
+
+    const stages: GameState['stage'][] = [
+      'deal',
+      'guess',
+      'play',
+      'result',
+      'scoreboard',
+    ]
+    const currentStageIndex = stages.indexOf(gameState.stage)
+
+    if (currentStageIndex > 0) {
+      // Move back one stage in current round
+      gameState.stage = stages[currentStageIndex - 1]
+      updateURL(gameState.currentRound, gameState.stage)
+    } else if (gameState.currentRound > 1) {
+      // Move to scoreboard of previous round
+      gameState.currentRound -= 1
+      gameState.stage = 'scoreboard'
+      updateURL(gameState.currentRound, 'scoreboard')
+    } else {
+      // At start of game, go home
+      goto('/')
+      return
+    }
+
+    gameState = { ...gameState }
+    setGameState(gameState)
   }
 </script>
 
@@ -395,35 +432,59 @@
 
   <footer class="container">
     {#if gameState}
-      {#if gameState.stage === 'scoreboard'}
+      {#if gameState.stage === 'scoreboard' && gameState.currentRound !== gameState.totalRounds}
+        <button class="outline" on:click={handleFinishEarly}>
+          Finish game early
+        </button>
+      {:else if gameState.stage === 'scoreboard' && gameState.currentRound === gameState.totalRounds}
         <button
-          on:click={gameState.totalRounds === gameState.currentRound
-            ? () => {
-                clearGameState() // Clear the current game
-                goto('/')
-              }
-            : handleFinishEarly}
           class="outline"
+          on:click={() => {
+            clearGameState()
+            goto('/')
+          }}
         >
-          {gameState.totalRounds === gameState.currentRound
-            ? 'Go to home'
-            : 'Finish game early'}
+          Go to home
         </button>
       {/if}
-      <button
-        on:click={proceed}
-        disabled={!canProceed()}
-        class={gameState.stage === 'result' ||
-        (gameState.stage === 'scoreboard' &&
-          gameState.totalRounds === gameState.currentRound)
-          ? 'primary'
-          : ''}
-      >
-        {getButtonText(
-          gameState.stage,
-          gameState.totalRounds === gameState.currentRound,
-        )}
-      </button>
+
+      <div class="buttons">
+        {#if gameState.currentRound === 1 && gameState.stage === 'deal'}
+          <button
+            class="outline"
+            on:click={() => {
+              if (
+                confirm(
+                  'Are you sure you want to stop the game? This will end and not save the current game. You will be returned to the home screen.',
+                )
+              ) {
+                clearGameState()
+                goto('/')
+              }
+            }}
+          >
+            Stop game
+          </button>
+        {:else}
+          <button class="outline" on:click={handleBack}>Back</button>
+        {/if}
+
+        <button
+          on:click={proceed}
+          disabled={!canProceed()}
+          class={gameState.stage === 'result' ||
+          (gameState.stage === 'scoreboard' &&
+            gameState.totalRounds === gameState.currentRound)
+            ? 'primary'
+            : ''}
+        >
+          {getButtonText(
+            gameState.stage,
+            gameState.totalRounds,
+            gameState.currentRound,
+          )}
+        </button>
+      </div>
     {/if}
   </footer>
 </div>
@@ -445,6 +506,12 @@
   main {
     flex: 1;
     overflow-y: auto;
+  }
+
+  .buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
   }
 
   button {
