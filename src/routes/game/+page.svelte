@@ -14,8 +14,13 @@
   import ScoreboardStage from './ScoreboardStage.svelte'
   import { page } from '$app/stores'
   import { saveGameToHistory } from '$lib/gameHistory'
+  import Modal from '$lib/components/Modal.svelte'
 
   let gameState: GameState | null = null
+
+  // Modal state
+  type ModalType = 'stopGame' | 'finishEarly' | null
+  let activeModal: ModalType = null
 
   function initializeRound() {
     if (!gameState) return
@@ -299,19 +304,17 @@
     }
   }
 
+  function handleStopGame() {
+    clearGameState()
+    goto('/')
+  }
+
   function handleFinishEarly() {
-    if (
-      confirm(
-        'Are you sure you want to finish the game early? This will end and save the current game. You will be returned to the home screen.',
-      )
-    ) {
-      if (gameState) {
-        // Mark as completed and save to history
-        const completedGame = { ...gameState, completed: true }
-        saveGameToHistory(completedGame)
-        clearGameState() // Clear the game state after saving
-        goto('/')
-      }
+    if (gameState) {
+      const completedGame = { ...gameState, completed: true }
+      saveGameToHistory(completedGame)
+      clearGameState()
+      goto('/')
     }
   }
 
@@ -433,7 +436,7 @@
   <footer class="container">
     {#if gameState}
       {#if gameState.stage === 'scoreboard' && gameState.currentRound !== gameState.totalRounds}
-        <button class="outline" on:click={handleFinishEarly}>
+        <button class="outline" on:click={() => (activeModal = 'finishEarly')}>
           Finish game early
         </button>
       {:else if gameState.stage === 'scoreboard' && gameState.currentRound === gameState.totalRounds}
@@ -450,19 +453,7 @@
 
       <div class="buttons">
         {#if gameState.currentRound === 1 && gameState.stage === 'deal'}
-          <button
-            class="outline"
-            on:click={() => {
-              if (
-                confirm(
-                  'Are you sure you want to stop the game? This will end and not save the current game. You will be returned to the home screen.',
-                )
-              ) {
-                clearGameState()
-                goto('/')
-              }
-            }}
-          >
+          <button class="outline" on:click={() => (activeModal = 'stopGame')}>
             Stop game
           </button>
         {:else}
@@ -488,6 +479,29 @@
     {/if}
   </footer>
 </div>
+
+<!-- Add modals -->
+{#if activeModal === 'stopGame'}
+  <Modal
+    title="Stop the game?"
+    message="Are you sure you want to stop the game? This will end and not save the current game. You will be returned to the home screen."
+    primaryText="Stop game"
+    primaryAction={handleStopGame}
+    secondaryText="Keep playing"
+    secondaryAction={() => (activeModal = null)}
+    open={true}
+  />
+{:else if activeModal === 'finishEarly'}
+  <Modal
+    title="Finish Game Early"
+    message="Are you sure you want to finish the game early? This will end and save the current game. You will be returned to the home screen."
+    primaryText="Finish game"
+    primaryAction={handleFinishEarly}
+    secondaryText="Keep playing"
+    secondaryAction={() => (activeModal = null)}
+    open={true}
+  />
+{/if}
 
 <style>
   .page {

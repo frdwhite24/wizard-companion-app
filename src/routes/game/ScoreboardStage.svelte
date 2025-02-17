@@ -217,7 +217,8 @@
   }
 
   table {
-    width: max-content; /* Allow table to be wider than container */
+    width: max-content;
+    min-width: 100%; /* Ensure table is at least viewport width */
   }
 
   .positive {
@@ -274,8 +275,7 @@
 
   /* Align round headers with their sub-columns */
   th[colspan='3'] {
-    padding: 0.25rem 1rem;
-    text-align: left; /* Align with first sub-column */
+    text-align: center; /* Align with first sub-column */
   }
 
   /* Group sub-columns within rounds */
@@ -293,11 +293,6 @@
     padding-left: 1rem; /* Add space before each new round */
   }
 
-  /* Keep consistent padding for data cells */
-  tbody td:not(:first-child) {
-    padding: 0.25rem 0.25rem; /* Match sub-header padding */
-  }
-
   /* Make header text uniform height small caps */
   th {
     font-variant-caps: all-small-caps;
@@ -305,10 +300,17 @@
     letter-spacing: 0.05em;
   }
 
-  /* Update first column width to match content */
+  /* Make player column flex to fill space */
   td:first-child {
-    width: fit-content;
-    max-width: 9rem;
-    padding: 0.25rem 0.5rem;
+    width: 100%; /* Allow cell to grow */
+    min-width: 5ch; /* Keep minimum readable width */
+    max-width: 9rem; /* Cap maximum width */
+  }
+
+  /* When table is wider than viewport, revert to fixed width */
+  @media (min-width: 100vw) {
+    td:first-child {
+      width: fit-content;
+    }
   }
 </style>
