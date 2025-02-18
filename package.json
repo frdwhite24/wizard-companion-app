@@ -32,7 +32,6 @@
     "vite": "^6.0.8"
   },
   "dependencies": {
-    "@picocss/pico": "^2.0.6",
     "sst": "3.9.5",
     "svelte-kit-sst": "2.43.5"
   }
