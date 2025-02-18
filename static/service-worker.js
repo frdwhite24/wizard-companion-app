@@ -1,28 +1,44 @@
-const CACHE_NAME = 'wizard-companion-v1'
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'wizard-companion-v2'
+
+// Just cache essential static assets
+const STATIC_ASSETS = [
   '/',
   '/manifest.json',
-  '/sitemap.xml',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/icon-180.png',
   'https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.violet.min.css',
 ]
 
-// Install event - cache basic assets
+// Install event - cache static assets
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS_TO_CACHE)
+      return cache.addAll(STATIC_ASSETS)
     }),
   )
 })
 
-// Fetch event - serve from cache, fall back to network
+// Clean up old caches
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            return caches.delete(cacheName)
+          }
+        }),
+      )
+    }),
+  )
+})
+
+// Simple fetch strategy: try network first, fall back to cache
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((response) => {
-      return response || fetch(event.request)
+    fetch(event.request).catch(() => {
+      return caches.match(event.request)
     }),
   )
 })

@@ -5,6 +5,8 @@
   import { goto } from '$app/navigation'
   import logo from '$lib/assets/logo.png'
   import { clearCreateGameState } from '$lib/storage/createGame'
+  import { onMount } from 'svelte'
+  import { preloadData } from '$app/navigation'
 
   $: gameInProgress = getGameState() !== null
   $: setupInProgress = getCreateGameState() !== null
@@ -28,6 +30,14 @@
   function continueSetup() {
     goto('/create-game')
   }
+
+  onMount(() => {
+    // Prefetch all main routes
+    const routes = ['/game', '/create-game', '/history']
+    routes.forEach((route) => {
+      preloadData(route)
+    })
+  })
 </script>
 
 <div class="page">

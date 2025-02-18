@@ -17,7 +17,7 @@
   })
 </script>
 
-<div class="wrapper">
+<div class="wrapper" data-sveltekit-preload-data>
   <slot />
 </div>
 

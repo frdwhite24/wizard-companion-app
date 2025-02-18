@@ -19,7 +19,9 @@ export function updateThemeColor() {
     .trim()
 
   // Update theme-color meta tags
-  const metaTags = document.querySelectorAll('meta[name="theme-color"]')
+  const metaTags = document.querySelectorAll<HTMLMetaElement>(
+    'meta[name="theme-color"]',
+  )
   metaTags.forEach((tag) => {
     if (
       tag.media === '(prefers-color-scheme: dark)' ||
