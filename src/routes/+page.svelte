@@ -66,7 +66,6 @@
   main {
     flex: 1;
     overflow-y: auto;
-    padding: 2rem 1rem;
     text-align: center;
   }
 
@@ -76,8 +75,7 @@
 
   footer {
     flex-shrink: 0;
-    padding: 1rem;
-    background: var(--background-color);
+    padding-top: 1rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;

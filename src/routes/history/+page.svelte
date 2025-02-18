@@ -2,7 +2,6 @@
   import { loadGameHistory } from '$lib/gameHistory'
   import type { GameSummary } from '$lib/gameHistory'
   import { goto } from '$app/navigation'
-  import type { CreateGameState } from '$lib/storage/createGame'
 
   const gameHistory = loadGameHistory()
 
@@ -56,9 +55,10 @@
 </script>
 
 <div class="page">
-  <main class="container">
+  <header class="container">
     <h1>Game History</h1>
-
+  </header>
+  <main class="container">
     <div class="games">
       {#each gameHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) as game}
         <article>
@@ -143,13 +143,11 @@
   main {
     flex: 1;
     overflow-y: auto;
-    padding: 1rem;
   }
 
   footer {
     flex-shrink: 0;
-    padding: 1rem;
-    background: var(--background-color);
+    padding-top: 1rem;
   }
 
   .games {
@@ -229,7 +227,6 @@
   article footer {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid var(--border-color);
   }
 
   article button {

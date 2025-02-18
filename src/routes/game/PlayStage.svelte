@@ -91,7 +91,6 @@
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    color: var(--secondary);
     width: 5rem;
     text-align: center;
     justify-self: center;
@@ -102,7 +101,6 @@
     gap: 0;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     border-top: 2px solid rgba(147, 51, 234, 0.2);
-    border-radius: var(--border-radius);
     overflow: hidden;
   }
 
@@ -124,13 +122,11 @@
   .name {
     font-size: 1.2rem;
     font-weight: 500;
-    color: var(--primary);
   }
 
   .message {
     font-size: 0.9rem;
     font-weight: normal;
-    color: var(--secondary);
     font-style: italic;
     margin-top: 0.25rem;
   }
@@ -140,10 +136,6 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: var(--secondary);
-    color: var(--secondary-inverse);
-    /* padding: 0.25rem 0.75rem; */
-    border-radius: var(--border-radius);
     text-align: center;
     min-width: 5rem;
   }

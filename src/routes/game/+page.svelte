@@ -510,11 +510,9 @@
     height: 100%;
   }
 
-  header,
   footer {
     flex-shrink: 0;
-    padding: 1rem;
-    background: var(--background-color);
+    padding-top: 1rem;
   }
 
   main {

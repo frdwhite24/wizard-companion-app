@@ -90,7 +90,6 @@
     gap: 0;
     margin-top: 1.5rem;
     border-top: 2px solid rgba(147, 51, 234, 0.2);
-    border-radius: var(--border-radius);
     overflow: hidden;
   }
 
@@ -129,7 +128,6 @@
     flex-direction: column;
     align-items: center;
     padding: 0.25rem 0.75rem;
-    border-radius: var(--border-radius);
     min-width: 4rem;
   }
 
@@ -161,7 +159,6 @@
 
   .validation {
     padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
     font-size: 0.9rem;
     width: 100%;
     text-align: center;

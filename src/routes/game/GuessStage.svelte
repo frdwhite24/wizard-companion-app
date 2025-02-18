@@ -90,8 +90,6 @@
     align-items: center;
     padding: 0.75rem;
     gap: 1rem;
-    border: 1px solid var(--secondary);
-    border-radius: var(--border-radius);
   }
 
   .player-info {
@@ -128,12 +126,10 @@
   }
 
   .warning {
-    color: var(--error);
     font-size: 0.8rem;
   }
 
   .info {
-    color: var(--secondary);
     font-size: 0.8rem;
   }
 </style>

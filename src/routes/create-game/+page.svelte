@@ -178,24 +178,14 @@
     height: 100%;
   }
 
-  header,
   footer {
     flex-shrink: 0;
-    padding: 1rem;
-    background: var(--background-color);
+    padding-top: 1rem;
   }
 
   main {
     flex: 1;
     overflow-y: auto;
-  }
-
-  footer {
-    border-top: 1px solid var(--secondary);
-  }
-
-  header {
-    border-bottom: 1px solid var(--secondary);
   }
 
   .buttons {
