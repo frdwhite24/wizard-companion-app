@@ -35,6 +35,7 @@
     <img alt="The wizard card game logo" src={logo} />
     <h1>Wizard Card Game</h1>
     <p>A companion app for playing Wizard</p>
+    <small>Made with ❤️ from Fred</small>
   </main>
 
   <footer class="container">
