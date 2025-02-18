@@ -11,6 +11,10 @@
     if (enteredPlayerName && !players.includes(enteredPlayerName)) {
       onAddPlayer(enteredPlayerName)
       newPlayerName = ''
+      const input = document.getElementById('playerName')
+      if (input instanceof HTMLInputElement) {
+        input.focus()
+      }
     }
   }
 </script>
