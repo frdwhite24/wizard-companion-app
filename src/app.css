@@ -1,5 +1,4 @@
 html {
-  /* Existing styles... */
   touch-action: pan-y pinch-zoom; /* Only allow vertical scrolling and pinch zoom */
   overscroll-behavior: none; /* Prevent bounce/rubber-band effect */
 }
@@ -7,4 +6,20 @@ html {
 body {
   /* Existing styles... */
   overscroll-behavior: none; /* Ensure it's applied to body too */
+}
+
+/* Ensure all headings use the Metamorphous font */
+html,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family:
+    'Metamorphous',
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    sans-serif;
 }

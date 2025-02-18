@@ -44,7 +44,7 @@
       disabled={players.length >= 6}
     />
   </label>
-  <button type="submit" disabled={players.length >= 6}> Add player </button>
+  <button type="submit" disabled={players.length >= 6}>Add player</button>
 </form>
 
 <style>

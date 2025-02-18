@@ -161,7 +161,7 @@
 
   <footer class="container">
     <div class="buttons">
-      <button class="outline" on:click={() => history.back()}> Back </button>
+      <button class="outline" on:click={() => history.back()}>Back</button>
       <button
         disabled={!canProceed}
         on:click={gameState.step === 3 ? startGame : nextStep}

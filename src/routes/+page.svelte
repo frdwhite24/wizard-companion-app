@@ -45,6 +45,12 @@
     <img alt="The wizard card game logo" src={logo} />
     <h1>Wizard Card Game</h1>
     <p>A companion app for playing Wizard</p>
+    <a
+      href="https://mobilesyrup.com/2020/05/24/how-install-progressive-web-app-pwa-android-ios-pc-mac/"
+      class="install-button"
+      target="_blank"
+      rel="noopener noreferrer">How To: Install the App</a
+    >
     <small>Made with ❤️ from Fred</small>
   </main>
 
@@ -93,5 +99,10 @@
 
   button {
     width: 100%;
+  }
+
+  .install-button {
+    display: block;
+    margin-bottom: 1rem;
   }
 </style>
