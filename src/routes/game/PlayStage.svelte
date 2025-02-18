@@ -99,7 +99,7 @@
   .players {
     display: grid;
     gap: 0;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: 1fr;
     border-top: 2px solid rgba(147, 51, 234, 0.2);
     overflow: hidden;
   }
