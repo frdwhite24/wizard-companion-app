@@ -51,7 +51,7 @@
       target="_blank"
       rel="noopener noreferrer">How To: Install the App</a
     >
-    <small>Made with ❤️ from Fred</small>
+    <small>Made with ❤️ by Fred</small>
   </main>
 
   <footer class="container">
