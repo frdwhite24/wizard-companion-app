@@ -14,6 +14,7 @@
   import ConfirmGame from './ConfirmGame.svelte'
   import { calculateRounds } from '$lib/utils/gameCalculations'
   import { setGameState } from '$lib/storage/gameState'
+  import confetti from 'canvas-confetti'
 
   let gameState: CreateGameState = {
     step: 1,
@@ -132,6 +133,7 @@
     })
     clearCreateGameState()
     goto('/game')
+    confetti()
   }
 
   $: canProceed = gameState.players.length >= 3 && gameState.players.length <= 6

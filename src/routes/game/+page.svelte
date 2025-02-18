@@ -15,6 +15,7 @@
   import { page } from '$app/stores'
   import { saveGameToHistory } from '$lib/gameHistory'
   import Modal from '$lib/components/Modal.svelte'
+  import confetti from 'canvas-confetti'
 
   let gameState: GameState | null = null
 
@@ -216,9 +217,13 @@
           const completedGame = { ...gameState, completed: true }
           setGameState(completedGame)
           saveGameToHistory(completedGame)
+          gameState.stage = 'scoreboard'
+          updateURL(gameState.currentRound, 'scoreboard')
+          confetti()
+        } else {
+          gameState.stage = 'scoreboard'
+          updateURL(gameState.currentRound, 'scoreboard')
         }
-        gameState.stage = 'scoreboard'
-        updateURL(gameState.currentRound, 'scoreboard')
         break
       case 'scoreboard':
         if (gameState.currentRound === gameState.totalRounds) {

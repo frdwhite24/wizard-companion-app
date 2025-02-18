@@ -7,8 +7,9 @@
 
   function handleSubmit(e: SubmitEvent) {
     e.preventDefault()
-    if (newPlayerName.trim()) {
-      onAddPlayer(newPlayerName.trim())
+    const enteredPlayerName = newPlayerName.trim()
+    if (enteredPlayerName && !players.includes(enteredPlayerName)) {
+      onAddPlayer(enteredPlayerName)
       newPlayerName = ''
     }
   }

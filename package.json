@@ -19,6 +19,7 @@
     "@sveltejs/adapter-auto": "^4.0.0",
     "@sveltejs/kit": "^2.16.0",
     "@sveltejs/vite-plugin-svelte": "^5.0.0",
+    "@types/canvas-confetti": "^1.9.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-svelte": "^2.46.1",
@@ -32,6 +33,7 @@
     "vite": "^6.0.8"
   },
   "dependencies": {
+    "canvas-confetti": "^1.9.3",
     "sst": "3.9.5",
     "svelte-kit-sst": "2.43.5"
   }
