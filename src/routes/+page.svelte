@@ -70,7 +70,7 @@
   }
 
   img {
-    padding: 1rem 0;
+    padding-bottom: 1rem;
   }
 
   footer {

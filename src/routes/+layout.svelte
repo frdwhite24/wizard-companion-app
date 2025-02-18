@@ -24,6 +24,7 @@
 <style>
   .wrapper {
     height: 100dvh;
-    padding: 1.5rem 0rem;
+    padding: 1.6rem 0rem;
+    padding-bottom: calc(1.6rem + env(safe-area-inset-bottom));
   }
 </style>
