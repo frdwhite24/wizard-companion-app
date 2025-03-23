@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "canvas-confetti": "^1.9.3",
-    "sst": "3.9.5",
+    "sst": "3.10.8",
     "svelte-kit-sst": "2.43.5"
   }
 }
