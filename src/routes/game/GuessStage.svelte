@@ -82,7 +82,8 @@
   .players {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
+    margin-top: 32px;
   }
 
   .player-row {

@@ -56,7 +56,7 @@
   {#each orderedPlayers as player}
     <div class="player-row">
       <div class="player-info">
-        <div class="name pico-color-violet-500">{player}</div>
+        <p class="name pico-color-violet-500">{player}</p>
         <div class="guess pico-color-violet-300">
           Guessed <strong>{guesses[player]}</strong>
         </div>
@@ -74,10 +74,16 @@
         <button
           class="outline"
           on:click={() => onTrickChange(player, (tricks[player] ?? 0) + 1)}
-          >+</button
+          disabled={totalTricks >= currentRound}>+</button
         >
       </div>
-      <div class="score pico-color-violet-400">
+      <div
+        class="score pico-color-violet-400"
+        class:positive={playerScores[player] !== undefined &&
+          playerScores[player] > 0}
+        class:negative={playerScores[player] !== undefined &&
+          playerScores[player] < 0}
+      >
         {(playerScores[player] ?? 0) >= 0 ? '+' : ''}{playerScores[player] ?? 0}
       </div>
     </div>
@@ -102,6 +108,14 @@
     border-bottom: 2px solid rgba(147, 51, 234, 0.2);
   }
 
+  .positive {
+    color: rgb(52, 211, 153);
+  }
+
+  .negative {
+    color: rgb(239, 68, 68);
+  }
+
   .player-info {
     display: flex;
     flex-direction: column;
@@ -109,8 +123,8 @@
   }
 
   .name {
-    font-size: 1.2rem;
-    font-weight: 500;
+    margin-bottom: 0;
+    word-break: break-word;
   }
 
   .guess {
@@ -128,7 +142,7 @@
     flex-direction: column;
     align-items: center;
     padding: 0.25rem 0.75rem;
-    min-width: 4rem;
+    min-width: 3rem;
   }
 
   .trick-badge .number {
@@ -146,7 +160,7 @@
   .score {
     font-size: 1.2rem;
     font-weight: 500;
-    min-width: 4rem;
+    min-width: 3rem;
     text-align: right;
   }
 

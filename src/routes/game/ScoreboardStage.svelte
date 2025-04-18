@@ -158,13 +158,14 @@
         <tr>
           <th rowspan="2">Player</th>
           {#each roundResults as round}
-            <th colspan="3">Round {round.roundNumber}</th>
+            <th colspan="4">Round {round.roundNumber}</th>
           {/each}
         </tr>
         <tr>
           {#each roundResults as _}
             <th>Guess</th>
             <th>Won</th>
+            <th>Round</th>
             <th>Score</th>
           {/each}
         </tr>
@@ -187,12 +188,24 @@
               <td>{playerResult?.guess}</td>
               <td>{playerResult?.actual}</td>
               <td
-                class={(playerResult?.cumulativeScore ?? 0) === 0
-                  ? 'neutral'
-                  : (playerResult?.cumulativeScore ?? 0) > 0
-                    ? 'positive'
-                    : 'negative'}
+                class={calculateRoundScore(
+                  playerResult?.guess ?? 0,
+                  playerResult?.actual ?? 0,
+                ) > 0
+                  ? 'positive'
+                  : 'negative'}
               >
+                {calculateRoundScore(
+                  playerResult?.guess ?? 0,
+                  playerResult?.actual ?? 0,
+                ) > 0
+                  ? '+'
+                  : ''}{calculateRoundScore(
+                  playerResult?.guess ?? 0,
+                  playerResult?.actual ?? 0,
+                )}
+              </td>
+              <td>
                 {playerResult?.cumulativeScore ?? 0}
               </td>
             {/each}
@@ -274,7 +287,7 @@
   }
 
   /* Align round headers with their sub-columns */
-  th[colspan='3'] {
+  th[colspan='4'] {
     text-align: center; /* Align with first sub-column */
   }
 
@@ -283,12 +296,12 @@
     /* Sub-headers */
     padding: 0.25rem 0.25rem; /* Tighter padding between sub-columns */
   }
-  th:nth-child(3n + 1):not(:first-child) {
+  th:nth-child(4n + 1):not(:first-child) {
     /* First sub-header of each round */
     padding-left: 1rem; /* Add space before each new round */
   }
   /* Add spacing between rounds */
-  td:nth-child(3n-1):not(:first-child)  /* First column of each round */ {
+  td:nth-child(4n-1):not(:first-child)  /* First column of each round */ {
     /* First sub-header of each round */
     padding-left: 1rem; /* Add space before each new round */
   }

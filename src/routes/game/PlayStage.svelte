@@ -54,7 +54,9 @@
       <div class="player-card">
         <div class="content">
           <div class="name pico-color-violet-500">
-            {player}
+            <p>
+              {player}
+            </p>
             {#if getMessage(player)}
               <div class="message pico-color-violet-300">
                 {getMessage(player)}
@@ -119,9 +121,9 @@
     text-align: left;
   }
 
-  .name {
-    font-size: 1.2rem;
-    font-weight: 500;
+  .name p {
+    margin-bottom: 0;
+    word-break: break-word;
   }
 
   .message {
