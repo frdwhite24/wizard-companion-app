@@ -1,8 +1,11 @@
 <script lang="ts">
+  import type { GameConfig } from '$lib/types/gameConfig'
+
   export let currentRound: number
   export let players: string[]
   export let guesses: Record<string, number>
   export let onGuessChange: (player: string, value: number) => void
+  export let config: GameConfig
 
   $: dealerIndex = (currentRound - 1) % players.length
   $: firstGuesserIndex =
@@ -22,7 +25,11 @@
   }
 
   function getForbiddenMessage(player: string): string | null {
-    if (player !== orderedPlayers[orderedPlayers.length - 1]) return null
+    if (
+      player !== orderedPlayers[orderedPlayers.length - 1] ||
+      !config.guessRestrictionEnabled
+    )
+      return null
     const forbiddenValue = currentRound - getTotalGuessesExcluding(player)
     return forbiddenValue < 0
       ? 'May guess whatever they like'
@@ -82,7 +89,7 @@
   .players {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 24px;
     margin-top: 32px;
   }
 

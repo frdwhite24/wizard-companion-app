@@ -1,8 +1,10 @@
 <script lang="ts">
   import { calculateRounds } from '$lib/utils/gameCalculations'
   import { getPlayerRoles } from '$lib/data/playerRoles'
+  import type { GameConfig } from '$lib/types/gameConfig'
 
   export let players: string[]
+  export let config: GameConfig
 
   $: rounds = calculateRounds(players.length)
   $: playerRoles = getPlayerRoles(players.length)
@@ -22,16 +24,32 @@
     </div>
   {/each}
 </div>
+<div class="config-summary">
+  <p>Game configuration</p>
+  <small>
+    Guess restriction: {config.guessRestrictionEnabled
+      ? 'Total guesses cannot equal cards in play'
+      : 'No restriction on total guesses'}
+  </small>
+</div>
 
 <style>
   .summary {
     margin-bottom: 2rem;
   }
 
+  .config-summary {
+    margin-top: 32px;
+  }
+
+  .config-summary p {
+    margin: 0;
+  }
+
   .player-list {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px;
   }
 
   .player-row {

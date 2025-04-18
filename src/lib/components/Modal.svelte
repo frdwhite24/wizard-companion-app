@@ -9,10 +9,6 @@
   export let secondaryText: string | null = null
   export let open = false
 
-  function handleClose() {
-    open = false
-  }
-
   function handleBackdropClick(e: MouseEvent) {
     // Check if click was directly on the dialog element (backdrop)
     if (e.target === e.currentTarget) {

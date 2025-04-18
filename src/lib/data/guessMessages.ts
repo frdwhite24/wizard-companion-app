@@ -56,5 +56,5 @@ const lowGuessMessages = [
 
 export function getGuessMessage(isHigh: boolean) {
   const messages = isHigh ? highGuessMessages : lowGuessMessages
-  return messages[Math.floor(Math.random() * messages.length)]
+  return messages[Math.floor(Math.random() * messages.length)] || null
 }

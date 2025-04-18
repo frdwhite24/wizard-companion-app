@@ -5,6 +5,7 @@
   import { browser } from '$app/environment'
   import AddPlayers from './AddPlayers.svelte'
   import SeatingOrder from './SeatingOrder.svelte'
+  import GameConfig from './GameConfig.svelte'
   import {
     getCreateGameState,
     setCreateGameState,
@@ -14,12 +15,14 @@
   import ConfirmGame from './ConfirmGame.svelte'
   import { calculateRounds } from '$lib/utils/gameCalculations'
   import { setGameState } from '$lib/storage/gameState'
+  import { DEFAULT_GAME_CONFIG } from '$lib/types/gameConfig'
   import confetti from 'canvas-confetti'
 
   let gameState: CreateGameState = {
     step: 1,
     players: [],
     lastUpdated: Date.now(),
+    config: DEFAULT_GAME_CONFIG,
   }
 
   let mainElement: HTMLElement
@@ -30,7 +33,7 @@
       return 1
     }
     // Otherwise, allow current step if valid
-    return state.step >= 1 && state.step <= 3 ? state.step : 1
+    return state.step >= 1 && state.step <= 4 ? state.step : 1
   }
 
   // Listen for browser navigation
@@ -101,8 +104,11 @@
 
     // Swap players
     const temp = newPlayers[index]
-    newPlayers[index] = newPlayers[targetIndex]
-    newPlayers[targetIndex] = temp
+    const target = newPlayers[targetIndex]
+    if (target && temp) {
+      newPlayers[index] = target
+      newPlayers[targetIndex] = temp
+    }
 
     // Update state
     gameState = {
@@ -115,7 +121,7 @@
 
   function nextStep() {
     if (gameState.players.length >= 3 && gameState.players.length <= 6) {
-      gameState.step = gameState.step === 1 ? 2 : 3
+      gameState.step = Math.min(gameState.step + 1, 4)
       setCreateGameState(gameState)
       goto(`?step=${gameState.step}`, { keepFocus: true })
     }
@@ -130,6 +136,7 @@
       stage: 'deal',
       rounds: [],
       lastUpdated: Date.now(),
+      config: gameState.config,
     })
     clearCreateGameState()
     goto('/game')
@@ -137,12 +144,13 @@
   }
 
   $: canProceed = gameState.players.length >= 3 && gameState.players.length <= 6
+  $: progress = (gameState.step / 4) * 100
 </script>
 
 <div class="page">
   <header class="container">
-    <progress value={(gameState.step / 3) * 100} max="100"></progress>
-    <small>Step {gameState.step} of 3</small>
+    <progress value={progress} max="100"></progress>
+    <small>Step {gameState.step} of 4</small>
   </header>
 
   <main class="container" bind:this={mainElement}>
@@ -154,8 +162,16 @@
       />
     {:else if gameState.step === 2}
       <SeatingOrder players={gameState.players} onMove={movePlayer} />
-    {:else}
-      <ConfirmGame players={gameState.players} />
+    {:else if gameState.step === 3}
+      <GameConfig
+        config={gameState.config}
+        onChange={(config) => {
+          gameState.config = config
+          setCreateGameState(gameState)
+        }}
+      />
+    {:else if gameState.step === 4}
+      <ConfirmGame players={gameState.players} config={gameState.config} />
     {/if}
   </main>
 
@@ -164,10 +180,10 @@
       <button class="outline" on:click={() => history.back()}>Back</button>
       <button
         disabled={!canProceed}
-        on:click={gameState.step === 3 ? startGame : nextStep}
-        class={gameState.step === 3 ? 'primary' : ''}
+        on:click={gameState.step === 4 ? startGame : nextStep}
+        class={gameState.step === 4 ? 'primary' : ''}
       >
-        {gameState.step === 3 ? 'Start game!' : 'Continue'}
+        {gameState.step === 4 ? 'Start game!' : 'Continue'}
       </button>
     </div>
   </footer>

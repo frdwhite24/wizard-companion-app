@@ -161,13 +161,17 @@
           (p) => typeof currentRound.guesses[p] === 'number',
         )
 
-        // Total guesses must not equal number of cards
+        // Total guesses must not equal number of cards (only if restriction is enabled)
         const totalGuesses = Object.values(currentRound.guesses).reduce(
           (sum, g) => sum + g,
           0,
         )
 
-        return allGuessed && totalGuesses !== gameState.currentRound
+        const restrictGuesses = gameState.config.guessRestrictionEnabled
+        return (
+          allGuessed &&
+          (!restrictGuesses || totalGuesses !== gameState.currentRound)
+        )
       }
       case 'play':
         return true
@@ -337,6 +341,7 @@
         stage: 'deal',
         rounds: [],
         lastUpdated: Date.now(),
+        config: gameState.config, // Keep the same config for rematch
       }
 
       // Update both state and URL synchronously
@@ -359,8 +364,12 @@
 
     if (currentStageIndex > 0) {
       // Move back one stage in current round
-      gameState.stage = stages[currentStageIndex - 1]
-      updateURL(gameState.currentRound, gameState.stage)
+      const newStage = stages[currentStageIndex - 1]
+      if (newStage) {
+        // Add type guard
+        gameState.stage = newStage
+        updateURL(gameState.currentRound, gameState.stage)
+      }
     } else if (gameState.currentRound > 1) {
       // Move to scoreboard of previous round
       gameState.currentRound -= 1
@@ -405,6 +414,7 @@
           players={gameState.players}
           guesses={currentGuesses}
           onGuessChange={handleGuessChange}
+          config={gameState.config}
         />
       {:else if gameState.stage === 'play'}
         <PlayStage
