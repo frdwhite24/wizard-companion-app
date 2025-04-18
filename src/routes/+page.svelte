@@ -33,7 +33,7 @@
 
   onMount(() => {
     // Prefetch all main routes
-    const routes = ['/game', '/create-game', '/history']
+    const routes = ['/game', '/create-game', '/history', '/records']
     routes.forEach((route) => {
       preloadData(route)
     })
@@ -67,6 +67,7 @@
     {/if}
     {#if hasHistory}
       <a href="/history" role="button" class="outline">Game History</a>
+      <a href="/records" role="button" class="outline">Records</a>
     {/if}
     <button on:click={startNewGame} class="primary">Start new game</button>
   </footer>
