@@ -4,6 +4,6 @@
   </a>
   <h1 align="center">Wizard Companion App 🪄🧙🏼✨🧙</h1>
   <p>
-    Welcome to my improved, UX-focused take on all the Wizard helper apps out there. It's clean, crisp and without ads. Nothing more to say, just check it out at: {DEPLOYED URL ONCE DONE}, and enjoy your game.
+    Welcome to my improved, UX-focused take on all the Wizard helper apps out there. It's clean, crisp and without ads. Nothing more to say, just check it out at: https://d3cfpk4ju180uf.cloudfront.net/, and enjoy your game.
   </p>
 </p>
