@@ -125,6 +125,9 @@
       medal = '🥈'
     } else if (playersAhead === 2) {
       medal = '🥉'
+    } else if (position === players.length - 1) {
+      // Add turtle for last place if they don't have a medal
+      medal = '🐢'
     }
 
     // Add correct rounds count if there's a same score (even for first place)
