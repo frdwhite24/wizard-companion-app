@@ -29,6 +29,11 @@
   $: shouldShowHighMessage = highestGuess >= secondHighestGuess + 2
   $: shouldShowLowMessage = lowestGuess <= secondLowestGuess - 2
 
+  $: totalGuesses = Object.values(guesses).reduce((sum, g) => sum + g, 0)
+  $: isOverSubscribed = totalGuesses > currentRound
+  $: isUnderSubscribed = totalGuesses < currentRound
+  $: difference = Math.abs(totalGuesses - currentRound)
+
   function getMessage(player: string): string | null {
     if (player === highestGuesser && shouldShowHighMessage) {
       return getGuessMessage(true)
@@ -42,6 +47,22 @@
 
 <h1>Play the round</h1>
 <p>Play the tricks and keep track of who wins them</p>
+
+<div class="status">
+  <div
+    class="validation {isOverSubscribed
+      ? 'over'
+      : isUnderSubscribed
+        ? 'under'
+        : 'exact'}"
+  >
+    {isOverSubscribed
+      ? `Oversubscribed by ${difference}`
+      : isUnderSubscribed
+        ? `Undersubscribed by ${difference}`
+        : 'Exact'}
+  </div>
+</div>
 
 <div class="wrapper">
   <div class="header">
@@ -77,7 +98,7 @@
 
 <style>
   .wrapper {
-    margin-top: 2rem;
+    margin-top: 1rem;
     display: grid;
     gap: 0.5rem;
   }
@@ -152,5 +173,34 @@
     font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+  }
+
+  .status {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    margin-top: 1rem;
+  }
+
+  .validation {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .over {
+    background: rgba(147, 51, 234, 0.1);
+    color: rgb(147, 51, 234);
+  }
+
+  .under {
+    background: rgba(147, 51, 234, 0.1);
+    color: rgb(147, 51, 234);
+  }
+
+  .exact {
+    background: rgba(52, 211, 153, 0.1);
+    color: rgb(52, 211, 153);
   }
 </style>
