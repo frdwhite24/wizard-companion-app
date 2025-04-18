@@ -9,16 +9,16 @@
 </script>
 
 <h1>Is this correct?</h1>
-
 <div class="summary">
   <p>Playing with {players.length} players over {rounds} rounds</p>
 </div>
-
 <div class="player-list">
   {#each players as player, index}
     <div class="player-row">
-      <span class="name">{player}</span>
-      <small class="role">{playerRoles[index]}</small>
+      <p>
+        {player}
+      </p>
+      <small>{playerRoles[index]} </small>
     </div>
   {/each}
 </div>
@@ -31,28 +31,20 @@
   .player-list {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 24px;
   }
 
   .player-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem;
-    border: 1px solid var(--secondary);
-    border-radius: var(--border-radius);
-    gap: 1rem;
+    flex-direction: column;
+    gap: 8px;
   }
 
-  .name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    flex-shrink: 1;
+  .player-row p {
+    margin-bottom: 0;
   }
 
-  .role {
-    color: var(--secondary);
-    flex-shrink: 0;
+  small {
+    color: var(--pico-secondary);
   }
 </style>

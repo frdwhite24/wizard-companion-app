@@ -15,7 +15,7 @@
 <div class="players">
   {#each players as player, index}
     <div class="player-row">
-      <span>{player}</span>
+      <p>{player}</p>
       {#if index === dealerIndex}
         <small>Dealing</small>
       {/if}
@@ -27,14 +27,21 @@
   .players {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 24px;
     margin-top: 2rem;
   }
 
   .player-row {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .player-row p {
+    margin-bottom: 0;
+  }
+
+  small {
+    color: var(--pico-secondary);
   }
 </style>

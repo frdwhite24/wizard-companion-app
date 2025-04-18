@@ -11,7 +11,7 @@
 <div class="player-list">
   {#each players as player, index (player)}
     <div class="player-row" animate:flip={{ duration: 300 }}>
-      <span>{player}</span>
+      <p>{player}</p>
       <div class="controls">
         <button
           class="outline"
@@ -36,15 +36,19 @@
   .player-list {
     display: flex;
     flex-direction: column;
+    gap: 8px;
   }
 
   .player-row {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 1rem;
     align-items: center;
-    padding: 0.5rem;
-    border: 1px solid var(--secondary);
-    border-radius: var(--border-radius);
+  }
+
+  .player-row p {
+    margin: 0;
+    word-break: break-word;
   }
 
   .controls {

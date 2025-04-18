@@ -30,7 +30,7 @@
   }
 
   function updateGuess(player: string, value: number) {
-    if (value >= 0) {
+    if (value >= 0 && value <= currentRound) {
       onGuessChange(player, value)
     }
   }
@@ -54,7 +54,7 @@
   {#each orderedPlayers as player}
     <div class="player-row">
       <div class="player-info">
-        <span>{player}</span>
+        <p>{player}</p>
         {#if getPlayerMessage(player) !== null}
           <small class={getMessageClass(player)}
             >{getPlayerMessage(player)}</small
@@ -71,7 +71,7 @@
         <button
           class="outline"
           on:click={() => updateGuess(player, (guesses[player] ?? 0) + 1)}
-          >+</button
+          disabled={(guesses[player] ?? 0) >= currentRound}>+</button
         >
       </div>
     </div>
@@ -82,13 +82,13 @@
   .players {
     display: flex;
     flex-direction: column;
+    gap: 24px;
   }
 
   .player-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem;
     gap: 1rem;
   }
 
@@ -100,28 +100,25 @@
     flex: 1;
   }
 
-  .player-info span {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .player-info p {
+    margin-bottom: 0;
   }
 
   .guess-controls {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 8px;
     flex-shrink: 0;
   }
 
   .guess-value {
-    min-width: 2.5rem;
+    min-width: 2rem;
     text-align: center;
     font-size: 1.2rem;
   }
 
   button {
     padding: 0.5rem 1rem;
-    min-width: 3rem;
     font-size: 1.2rem;
   }
 
