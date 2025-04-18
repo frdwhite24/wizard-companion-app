@@ -193,4 +193,19 @@
     min-width: 3rem;
     font-size: 1.2rem;
   }
+
+  @media (max-width: 400px) {
+    .player-row {
+      gap: 8px;
+    }
+
+    .trick-badge {
+      padding: 0;
+      min-width: unset;
+    }
+
+    .score {
+      min-width: unset;
+    }
+  }
 </style>
