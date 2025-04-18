@@ -71,14 +71,16 @@
   </div>
 
   <div class="players">
-    {#each orderedPlayers as player}
+    {#each orderedPlayers as player, i}
       <div class="player-card">
         <div class="content">
           <div class="name pico-color-violet-500">
             <p>
               {player}
             </p>
-            {#if getMessage(player)}
+            {#if i === 0}
+              <div class="message pico-color-violet-300">Plays first</div>
+            {:else if getMessage(player)}
               <div class="message pico-color-violet-300">
                 {getMessage(player)}
               </div>
