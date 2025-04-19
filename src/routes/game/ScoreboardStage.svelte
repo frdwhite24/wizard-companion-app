@@ -272,8 +272,21 @@
   th[rowspan='2']:first-child,
   td:first-child {
     position: sticky;
-    left: 0;
+    left: -1px; /* Pull slightly left to cover any gap */
     background-color: var(--pico-background-color);
+    z-index: 2;
+  }
+
+  /* Add a pseudo-element for the border that will be part of the sticky stacking context */
+  th[rowspan='2']:first-child::after,
+  td:first-child::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: var(--pico-border-width);
+    background-color: var(--pico-table-border-color);
     z-index: 2;
   }
 
@@ -283,36 +296,14 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Base padding for all cells */
-  td,
-  th {
-    padding: 0.25rem 0.5rem;
-  }
-
   /* Align round headers with their sub-columns */
   th[colspan='4'] {
     text-align: center; /* Align with first sub-column */
   }
 
-  /* Group sub-columns within rounds */
-  tr:last-child th {
-    /* Sub-headers */
-    padding: 0.25rem 0.25rem; /* Tighter padding between sub-columns */
-  }
-  th:nth-child(4n + 1):not(:first-child) {
-    /* First sub-header of each round */
-    padding-left: 1rem; /* Add space before each new round */
-  }
-  /* Add spacing between rounds */
-  td:nth-child(4n-1):not(:first-child)  /* First column of each round */ {
-    /* First sub-header of each round */
-    padding-left: 1rem; /* Add space before each new round */
-  }
-
   /* Make header text uniform height small caps */
   th {
     font-variant-caps: all-small-caps;
-    font-size: 0.9rem;
     letter-spacing: 0.05em;
   }
 
@@ -328,5 +319,17 @@
     td:first-child {
       width: fit-content;
     }
+  }
+
+  /* Target the first column of each round (every 4th column starting from column 6) */
+  td:nth-child(4n + 6),
+  th:nth-child(4n + 5) {
+    border-left: var(--pico-border-width) solid var(--pico-table-border-color);
+  }
+
+  /* Reduce horizontal padding for all cells except Player column */
+  tr > td:nth-child(n + 2),
+  tr:last-child > th {
+    padding-inline: 4px;
   }
 </style>
