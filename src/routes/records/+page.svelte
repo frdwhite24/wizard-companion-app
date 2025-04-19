@@ -1,6 +1,5 @@
 <script lang="ts">
   import { loadGameHistory } from '$lib/gameHistory'
-  import { goto } from '$app/navigation'
 
   $: gameHistory = loadGameHistory()
   $: allHistoricalScores = gameHistory
@@ -117,12 +116,12 @@
 
   .record-card.high {
     background: rgba(52, 211, 153, 0.1);
-    color: rgb(23, 95, 69);
+    color: var(--high-score-color, rgb(23, 95, 69));
   }
 
   .record-card.low {
     background: rgba(239, 68, 68, 0.1);
-    color: rgb(147, 42, 42);
+    color: var(--low-score-color, rgb(147, 42, 42));
   }
 
   .record-label {
@@ -157,6 +156,20 @@
 
     main::-webkit-scrollbar {
       display: none;
+    }
+  }
+
+  @media (prefers-color-scheme: light) {
+    * {
+      --high-score-color: rgb(23, 95, 69);
+      --low-score-color: rgb(147, 42, 42);
+    }
+  }
+
+  @media (prefers-color-scheme: dark) {
+    * {
+      --high-score-color: rgb(74, 222, 128);
+      --low-score-color: rgb(248, 113, 113);
     }
   }
 </style>
