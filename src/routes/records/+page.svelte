@@ -41,6 +41,95 @@
   $: leastCorrectGuessesRecord = allHistoricalScores.find(
     (s) => s.correctGuesses === leastCorrectGuesses,
   )
+
+  // New round-by-round records
+  $: allRoundScores = gameHistory
+    .filter((game) => game.roundScores) // Only games with round-by-round data
+    .flatMap((game) =>
+      game.roundScores!.flatMap((round) =>
+        round.scores.map((score) => ({
+          player: score.player,
+          score: score.score,
+          correctGuess: score.correctGuess,
+          gameId: game.id,
+          date: new Date(game.date),
+          round: round.round,
+        })),
+      ),
+    )
+    .sort((a, b) => a.date.getTime() - b.date.getTime())
+
+  $: biggestRoundWin =
+    allRoundScores.length > 0
+      ? Math.max(...allRoundScores.map((s) => s.score))
+      : 0
+  $: biggestRoundLoss =
+    allRoundScores.length > 0
+      ? Math.min(...allRoundScores.map((s) => s.score))
+      : 0
+  $: biggestRoundWinRecord = allRoundScores.find(
+    (s) => s.score === biggestRoundWin,
+  )
+  $: biggestRoundLossRecord = allRoundScores.find(
+    (s) => s.score === biggestRoundLoss,
+  )
+
+  // Calculate longest correct streak
+  $: longestCorrectStreak = (() => {
+    if (allRoundScores.length === 0) return 0
+
+    let maxStreak = 0
+    let currentStreak = 0
+    let lastPlayer = ''
+
+    allRoundScores.forEach((score) => {
+      if (score.player === lastPlayer && score.correctGuess) {
+        currentStreak++
+        maxStreak = Math.max(maxStreak, currentStreak)
+      } else if (score.correctGuess) {
+        currentStreak = 1
+        maxStreak = Math.max(maxStreak, currentStreak)
+      } else {
+        currentStreak = 0
+      }
+      lastPlayer = score.player
+    })
+
+    return maxStreak
+  })()
+  $: longestStreakRecord = (() => {
+    if (longestCorrectStreak === 0) return null
+
+    let currentStreak = 0
+    let lastPlayer = ''
+    let streakStartDate: Date | null = null
+    let streakPlayer = ''
+
+    for (const score of allRoundScores) {
+      if (score.player === lastPlayer && score.correctGuess) {
+        currentStreak++
+        if (currentStreak === longestCorrectStreak) {
+          streakPlayer = score.player
+          streakStartDate = score.date
+          break
+        }
+      } else if (score.correctGuess) {
+        currentStreak = 1
+        if (currentStreak === longestCorrectStreak) {
+          streakPlayer = score.player
+          streakStartDate = score.date
+          break
+        }
+      } else {
+        currentStreak = 0
+      }
+      lastPlayer = score.player
+    }
+
+    return streakStartDate
+      ? { player: streakPlayer, date: streakStartDate }
+      : null
+  })()
 </script>
 
 <div class="page">
@@ -74,6 +163,41 @@
         <div class="record-value">{leastCorrectGuesses}</div>
         <div class="record-details">
           {leastCorrectGuessesRecord?.player} on {leastCorrectGuessesRecord?.date.toLocaleDateString()}
+        </div>
+      </div>
+      <div class="record-card high">
+        <div class="record-label">Biggest Round Win</div>
+        <div class="record-value">{biggestRoundWin}</div>
+        <div class="record-details">
+          {#if biggestRoundWinRecord}
+            {biggestRoundWinRecord.player} in round {biggestRoundWinRecord.round}
+            on {biggestRoundWinRecord.date.toLocaleDateString()}
+          {:else}
+            No data available
+          {/if}
+        </div>
+      </div>
+      <div class="record-card low">
+        <div class="record-label">Biggest Round Loss</div>
+        <div class="record-value">{biggestRoundLoss}</div>
+        <div class="record-details">
+          {#if biggestRoundLossRecord}
+            {biggestRoundLossRecord.player} in round {biggestRoundLossRecord.round}
+            on {biggestRoundLossRecord.date.toLocaleDateString()}
+          {:else}
+            No data available
+          {/if}
+        </div>
+      </div>
+      <div class="record-card high">
+        <div class="record-label">Longest Correct Streak</div>
+        <div class="record-value">{longestCorrectStreak}</div>
+        <div class="record-details">
+          {#if longestStreakRecord}
+            {longestStreakRecord.player} on {longestStreakRecord.date.toLocaleDateString()}
+          {:else}
+            No data available
+          {/if}
         </div>
       </div>
     </div>

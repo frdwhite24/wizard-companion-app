@@ -1,5 +1,11 @@
 import type { GameState } from './gameState'
 
+export interface RoundScore {
+  player: string
+  score: number
+  correctGuess: boolean
+}
+
 export interface GameSummary {
   id: string // Unique identifier for the game
   date: string // ISO string of when game finished
@@ -10,6 +16,11 @@ export interface GameSummary {
     player: string
     score: number
     correctGuesses: number
+  }[]
+  // Optional round-by-round data for new games
+  roundScores?: {
+    round: number
+    scores: RoundScore[]
   }[]
 }
 
@@ -34,12 +45,23 @@ export function saveGameToHistory(game: GameState): void {
     }
   })
 
+  // Create round-by-round data for new games
+  const roundScores = game.rounds.map((round, index) => ({
+    round: index + 1,
+    scores: game.players.map((player) => ({
+      player,
+      score: round.scores[player] ?? 0,
+      correctGuess: round.guesses[player] === round.tricks[player],
+    })),
+  }))
+
   const summary: GameSummary = {
     id: crypto.randomUUID(),
     date: new Date().toISOString(),
     players: game.players,
     rounds: game.currentRound,
     scores,
+    roundScores,
   }
 
   gameHistory.push(summary)
