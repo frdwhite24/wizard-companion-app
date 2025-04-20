@@ -443,6 +443,8 @@
           currentRound={gameState.currentRound}
           players={gameState.players}
           rounds={gameState.rounds}
+          totalRounds={gameState.totalRounds}
+          gameUpdatedAt={gameState.lastUpdated}
         />
       {/if}
     {/if}
