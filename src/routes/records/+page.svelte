@@ -8,6 +8,7 @@
         player: score.player,
         score: score.score,
         correctGuesses: score.correctGuesses,
+        totalRounds: game.rounds,
         gameId: game.id,
         date: new Date(game.date),
       })),
@@ -29,17 +30,29 @@
   )
   $: mostCorrectGuesses =
     allHistoricalScores.length > 0
-      ? Math.max(...allHistoricalScores.map((s) => s.correctGuesses))
+      ? Math.max(
+          ...allHistoricalScores.map((s) =>
+            Math.round((s.correctGuesses / s.totalRounds) * 100),
+          ),
+        )
       : 0
   $: leastCorrectGuesses =
     allHistoricalScores.length > 0
-      ? Math.min(...allHistoricalScores.map((s) => s.correctGuesses))
+      ? Math.min(
+          ...allHistoricalScores.map((s) =>
+            Math.round((s.correctGuesses / s.totalRounds) * 100),
+          ),
+        )
       : 0
   $: mostCorrectGuessesRecord = allHistoricalScores.find(
-    (s) => s.correctGuesses === mostCorrectGuesses,
+    (s) =>
+      Math.round((s.correctGuesses / s.totalRounds) * 100) ===
+      mostCorrectGuesses,
   )
   $: leastCorrectGuessesRecord = allHistoricalScores.find(
-    (s) => s.correctGuesses === leastCorrectGuesses,
+    (s) =>
+      Math.round((s.correctGuesses / s.totalRounds) * 100) ===
+      leastCorrectGuesses,
   )
 
   // New round-by-round records
@@ -152,15 +165,15 @@
         </div>
       </div>
       <div class="record-card high">
-        <div class="record-label">Most Correct Guesses</div>
-        <div class="record-value">{mostCorrectGuesses}</div>
+        <div class="record-label">Best Guess Accuracy</div>
+        <div class="record-value">{mostCorrectGuesses}%</div>
         <div class="record-details">
           {mostCorrectGuessesRecord?.player} on {mostCorrectGuessesRecord?.date.toLocaleDateString()}
         </div>
       </div>
       <div class="record-card low">
-        <div class="record-label">Least Correct Guesses</div>
-        <div class="record-value">{leastCorrectGuesses}</div>
+        <div class="record-label">Worst Guess Accuracy</div>
+        <div class="record-value">{leastCorrectGuesses}%</div>
         <div class="record-details">
           {leastCorrectGuessesRecord?.player} on {leastCorrectGuessesRecord?.date.toLocaleDateString()}
         </div>
