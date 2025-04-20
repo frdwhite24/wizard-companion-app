@@ -60,24 +60,40 @@ export function calculateGameRecords(game: GameSummary): GameRecords {
     lastPlayer = score.player
   })
 
+  const bestAccuracyScore = scores.reduce(
+    (max, curr) => (curr.accuracy > max.accuracy ? curr : max),
+    scores[0] || { player: '', value: 0, accuracy: -Infinity },
+  )
+
+  const worstAccuracyScore = scores.reduce(
+    (min, curr) => (curr.accuracy < min.accuracy ? curr : min),
+    scores[0] || { player: '', value: 0, accuracy: Infinity },
+  )
+
   return {
-    highestScore: scores.reduce((max, curr) =>
-      curr.value > max.value ? curr : max,
+    highestScore: scores.reduce(
+      (max, curr) => (curr.value > max.value ? curr : max),
+      scores[0] || { player: '', value: -Infinity },
     ),
-    lowestScore: scores.reduce((min, curr) =>
-      curr.value < min.value ? curr : min,
+    lowestScore: scores.reduce(
+      (min, curr) => (curr.value < min.value ? curr : min),
+      scores[0] || { player: '', value: Infinity },
     ),
-    bestAccuracy: scores.reduce((max, curr) =>
-      curr.accuracy > max.accuracy ? curr : max,
+    bestAccuracy: {
+      player: bestAccuracyScore.player,
+      value: bestAccuracyScore.accuracy,
+    },
+    worstAccuracy: {
+      player: worstAccuracyScore.player,
+      value: worstAccuracyScore.accuracy,
+    },
+    biggestRoundWin: roundScores.reduce(
+      (max, curr) => (curr.value > max.value ? curr : max),
+      roundScores[0] || { player: '', value: -Infinity },
     ),
-    worstAccuracy: scores.reduce((min, curr) =>
-      curr.accuracy < min.accuracy ? curr : min,
-    ),
-    biggestRoundWin: roundScores.reduce((max, curr) =>
-      curr.value > max.value ? curr : max,
-    ),
-    biggestRoundLoss: roundScores.reduce((min, curr) =>
-      curr.value < min.value ? curr : min,
+    biggestRoundLoss: roundScores.reduce(
+      (min, curr) => (curr.value < min.value ? curr : min),
+      roundScores[0] || { player: '', value: Infinity },
     ),
     longestStreak: {
       player: streakPlayer,
@@ -138,24 +154,42 @@ export function calculateAllTimeRecords(games: GameSummary[]): GameRecords {
     lastPlayer = score.player
   })
 
+  const bestAccuracyScore = allScores.reduce(
+    (max, curr) => (curr.accuracy > max.accuracy ? curr : max),
+    allScores[0] || { player: '', value: 0, accuracy: -Infinity, date: null },
+  )
+
+  const worstAccuracyScore = allScores.reduce(
+    (min, curr) => (curr.accuracy < min.accuracy ? curr : min),
+    allScores[0] || { player: '', value: 0, accuracy: Infinity, date: null },
+  )
+
   return {
-    highestScore: allScores.reduce((max, curr) =>
-      curr.value > max.value ? curr : max,
+    highestScore: allScores.reduce(
+      (max, curr) => (curr.value > max.value ? curr : max),
+      allScores[0] || { player: '', value: -Infinity },
     ),
-    lowestScore: allScores.reduce((min, curr) =>
-      curr.value < min.value ? curr : min,
+    lowestScore: allScores.reduce(
+      (min, curr) => (curr.value < min.value ? curr : min),
+      allScores[0] || { player: '', value: Infinity },
     ),
-    bestAccuracy: allScores.reduce((max, curr) =>
-      curr.accuracy > max.accuracy ? curr : max,
+    bestAccuracy: {
+      player: bestAccuracyScore.player,
+      value: bestAccuracyScore.accuracy,
+      date: bestAccuracyScore.date,
+    },
+    worstAccuracy: {
+      player: worstAccuracyScore.player,
+      value: worstAccuracyScore.accuracy,
+      date: worstAccuracyScore.date,
+    },
+    biggestRoundWin: allRoundScores.reduce(
+      (max, curr) => (curr.value > max.value ? curr : max),
+      allRoundScores[0] || { player: '', value: -Infinity },
     ),
-    worstAccuracy: allScores.reduce((min, curr) =>
-      curr.accuracy < min.accuracy ? curr : min,
-    ),
-    biggestRoundWin: allRoundScores.reduce((max, curr) =>
-      curr.value > max.value ? curr : max,
-    ),
-    biggestRoundLoss: allRoundScores.reduce((min, curr) =>
-      curr.value < min.value ? curr : min,
+    biggestRoundLoss: allRoundScores.reduce(
+      (min, curr) => (curr.value < min.value ? curr : min),
+      allRoundScores[0] || { player: '', value: Infinity },
     ),
     longestStreak: {
       player: streakPlayer,
