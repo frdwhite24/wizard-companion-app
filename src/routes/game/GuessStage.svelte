@@ -24,6 +24,10 @@
       .reduce((sum, [_, guess]) => sum + guess, 0)
   }
 
+  // Calculate total guesses
+  $: totalGuesses = Object.values(guesses).reduce((sum, g) => sum + g, 0)
+  $: isExact = totalGuesses === currentRound
+
   function getForbiddenMessage(player: string): string | null {
     if (
       player !== orderedPlayers[orderedPlayers.length - 1] ||
@@ -56,6 +60,12 @@
 
 <h1>Make your guesses</h1>
 <p>Each player guesses how many tricks they'll win</p>
+
+<div class="status">
+  <div class="validation {isExact ? 'exact' : 'pending'}">
+    {totalGuesses} of {currentRound} trick{currentRound === 1 ? '' : 's'} claimed
+  </div>
+</div>
 
 <div class="players">
   {#each orderedPlayers as player}
@@ -136,5 +146,29 @@
 
   .info {
     font-size: 0.8rem;
+  }
+
+  .status {
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    margin: 1rem 0;
+  }
+
+  .validation {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    width: 100%;
+    text-align: center;
+  }
+
+  .validation.pending {
+    background: rgba(147, 51, 234, 0.1);
+    color: rgb(147, 51, 234);
+  }
+
+  .validation.exact {
+    background: rgba(52, 211, 153, 0.1);
+    color: rgb(52, 211, 153);
   }
 </style>
