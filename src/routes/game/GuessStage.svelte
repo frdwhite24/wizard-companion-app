@@ -20,9 +20,12 @@
 
   // Calculate total guesses excluding current player
   function getTotalGuessesExcluding(player: string): number {
-    return Object.entries(guesses)
-      .filter(([p]) => p !== player)
-      .reduce((sum, [_, guess]) => sum + guess, 0)
+    return (
+      Object.entries(guesses)
+        .filter(([p]) => p !== player)
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .reduce((sum, [_, guess]) => sum + guess, 0)
+    )
   }
 
   // Calculate total guesses
@@ -58,9 +61,9 @@
 <h1>Deal and guess</h1>
 <p>Deal the cards to each player and guess how many tricks they'll win</p>
 <div class="status">
-  <div class="validation {isExact ? 'exact' : 'pending'}">
+  <p class="validation {isExact ? 'exact' : 'pending'}">
     {totalGuesses} of {currentRound} trick{currentRound === 1 ? '' : 's'} claimed
-  </div>
+  </p>
 </div>
 <div class="players">
   {#each orderedPlayers as player}
@@ -94,7 +97,7 @@
   {/each}
 </div>
 <details>
-  <summary class="summary-text">What does the trump mean?</summary>
+  <summary class="summary-text">Is trump a wizard or jester?</summary>
   <p>
     If there are no cards left or a jester is turned there is no trump suit,
     only the wizards are trump.
@@ -154,17 +157,18 @@
   }
 
   .status {
-    height: 3rem;
     display: flex;
     align-items: center;
     margin: 1rem 0;
   }
 
   .validation {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    padding: 10px;
     width: 100%;
     text-align: center;
+    border-radius: var(--pico-border-radius);
+    margin: 0;
   }
 
   .validation.pending {
@@ -178,10 +182,13 @@
   }
 
   details {
-    border: 1px solid var(--pico-primary-border);
+    background: rgba(147, 51, 234, 0.1);
+    color: rgb(147, 51, 234);
     padding: 16px;
     border-radius: var(--pico-border-radius);
     margin-top: 16px;
+    color: rgb(147, 51, 234);
+    font-size: 0.8rem;
   }
 
   details p {

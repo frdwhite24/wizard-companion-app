@@ -8,7 +8,6 @@
     setGameState,
   } from '$lib/storage/gameState'
   import GuessStage from './GuessStage.svelte'
-  import PlayStage from './PlayStage.svelte'
   import ResultsStage from './ResultsStage.svelte'
   import ScoreboardStage from './ScoreboardStage.svelte'
   import { page } from '$app/stores'
@@ -65,7 +64,7 @@
 
     if (urlStage !== gameState.stage) {
       // Moving backwards within the same round
-      const stages: GameState['stage'][] = ['guess', 'play', 'result']
+      const stages: GameState['stage'][] = ['guess', 'result']
       const currentIndex = stages.indexOf(gameState.stage)
       const targetIndex = stages.indexOf(urlStage)
 
@@ -129,8 +128,6 @@
     const isSecondToLastRound = totalRounds - 1 === currentRound
     switch (stage) {
       case 'guess':
-        return 'Start playing'
-      case 'play':
         return 'Enter results'
       case 'result':
         return isFinalRound ? 'See final scores!' : 'See scoreboard'
@@ -168,8 +165,6 @@
           (!restrictGuesses || totalGuesses !== gameState.currentRound)
         )
       }
-      case 'play':
-        return true
       case 'result': {
         const currentRound = gameState.rounds[gameState.currentRound - 1]
         if (!currentRound) {
@@ -200,10 +195,6 @@
     switch (gameState.stage) {
       case 'guess':
         initializeRound()
-        gameState.stage = 'play'
-        updateURL(gameState.currentRound, 'play')
-        break
-      case 'play':
         gameState.stage = 'result'
         updateURL(gameState.currentRound, 'result')
         break
@@ -264,8 +255,6 @@
     switch (stage) {
       case 'guess':
         return 'Guessing'
-      case 'play':
-        return 'Playing'
       case 'result':
         return 'Round Results'
       case 'scoreboard':
@@ -278,8 +267,7 @@
     : 0
 
   $: stageProgress = gameState
-    ? ({ guess: 1, play: 2, result: 3, scoreboard: 4 }[gameState.stage] / 4) *
-      100
+    ? ({ guess: 1, result: 2, scoreboard: 3 }[gameState.stage] / 3) * 100
     : 0
 
   // Add tricks state handling
@@ -339,12 +327,7 @@
   function handleBack() {
     if (!gameState) return
 
-    const stages: GameState['stage'][] = [
-      'guess',
-      'play',
-      'result',
-      'scoreboard',
-    ]
+    const stages: GameState['stage'][] = ['guess', 'result', 'scoreboard']
     const currentStageIndex = stages.indexOf(gameState.stage)
 
     if (currentStageIndex > 0) {
@@ -395,12 +378,6 @@
           guesses={currentGuesses}
           onGuessChange={handleGuessChange}
           config={gameState.config}
-        />
-      {:else if gameState.stage === 'play'}
-        <PlayStage
-          currentRound={gameState.currentRound}
-          players={gameState.players}
-          guesses={currentGuesses}
         />
       {:else if gameState.stage === 'result'}
         <ResultsStage

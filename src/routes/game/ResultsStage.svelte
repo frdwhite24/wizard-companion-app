@@ -20,6 +20,11 @@
   $: totalTricks = Object.values(tricks).reduce((sum, t) => sum + t, 0)
   $: isValidTotal = totalTricks === currentRound
 
+  $: totalGuesses = Object.values(guesses).reduce((sum, g) => sum + g, 0)
+  $: isOverSubscribed = totalGuesses > currentRound
+  $: isUnderSubscribed = totalGuesses < currentRound
+  $: difference = Math.abs(totalGuesses - currentRound)
+
   function calculateAndSaveScore(player: string): number {
     const guess = guesses[player] ?? 0
     const actual = tricks[player] ?? 0
@@ -43,23 +48,40 @@
   )
 </script>
 
-<h1>Enter results</h1>
-<p>Record how many tricks each player won</p>
+<h1>Play and enter results</h1>
+<p>Play the round and record how many tricks each player won</p>
 
 <div class="status">
-  <div class="validation {isValidTotal ? 'success' : 'warning'}">
+  <p
+    class="validation {isOverSubscribed || isUnderSubscribed
+      ? 'warning'
+      : 'success'}"
+  >
+    {isOverSubscribed
+      ? `Oversubscribed by ${difference}`
+      : isUnderSubscribed
+        ? `Undersubscribed by ${difference}`
+        : 'Exact'}
+  </p>
+</div>
+
+<div class="status">
+  <p class="validation {isValidTotal ? 'success' : 'warning'}">
     {totalTricks} of {currentRound} trick{currentRound === 1 ? '' : 's'} recorded
-  </div>
+  </p>
 </div>
 
 <div class="players">
-  {#each orderedPlayers as player}
+  {#each orderedPlayers as player, index}
     <div class="player-row">
       <div class="player-info">
         <p class="name pico-color-violet-500">{player}</p>
-        <div class="guess pico-color-violet-300">
+        {#if index === 0}
+          <small class="guess pico-color-violet-300">Plays first</small>
+        {/if}
+        <small class="guess pico-color-violet-300">
           Guessed <strong>{guesses[player]}</strong>
-        </div>
+        </small>
       </div>
       <div class="trick-controls">
         <button
@@ -128,7 +150,8 @@
   }
 
   .guess {
-    font-size: 0.9rem;
+    font-size: 0.7rem;
+    line-height: 0.7rem;
   }
 
   .trick-controls {
@@ -165,17 +188,18 @@
   }
 
   .status {
-    height: 3rem;
     display: flex;
     align-items: center;
-    margin: 1rem 0;
+    margin: 8px 0;
   }
 
   .validation {
-    padding: 0.5rem 1rem;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
+    padding: 10px;
     width: 100%;
     text-align: center;
+    border-radius: var(--pico-border-radius);
+    margin-bottom: 0;
   }
 
   .warning {
