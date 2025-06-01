@@ -70,7 +70,9 @@ export function saveGameToHistory(game: GameState): void {
 
 export function loadGameHistory(): GameSummary[] {
   const stored = localStorage.getItem('gameHistory')
-  if (!stored) return []
+  if (!stored) {
+    return []
+  }
 
   try {
     return JSON.parse(stored)

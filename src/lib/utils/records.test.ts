@@ -328,7 +328,9 @@ describe('All-Time Records Calculation', () => {
 
     it('returns 0 and no player for no correct guesses in any game', () => {
       const noCorrectGames = multipleGameSummaries.map((game) => {
-        if (!game.roundScores) return game
+        if (!game.roundScores) {
+          return game
+        }
         return {
           ...game,
           roundScores: game.roundScores.map((round) => ({

@@ -22,12 +22,10 @@
 
   // Calculate total guesses excluding current player
   function getTotalGuessesExcluding(player: string): number {
-    return (
-      Object.entries(guesses)
-        .filter(([p]) => p !== player)
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        .reduce((sum, [_, guess]) => sum + guess, 0)
-    )
+    return Object.entries(guesses)
+      .filter(([p]) => p !== player)
+
+      .reduce((sum, [_, guess]) => sum + guess, 0)
   }
 
   // Calculate total guesses
@@ -38,8 +36,9 @@
     if (
       player !== orderedPlayers[orderedPlayers.length - 1] ||
       !config.guessRestrictionEnabled
-    )
+    ) {
       return null
+    }
     const forbiddenValue = currentRound - getTotalGuessesExcluding(player)
     return forbiddenValue < 0
       ? 'May guess whatever they like'
@@ -72,7 +71,7 @@
   </p>
 </div>
 <div class="players">
-  {#each orderedPlayers as player}
+  {#each orderedPlayers as player (player)}
     <div class="player-row">
       <div class="player-info">
         <p>{player}</p>

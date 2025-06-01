@@ -5,7 +5,9 @@ const GAME_CONFIG_KEY = 'gameConfig'
 
 export function getUserGameConfig(): GameConfig {
   const stored = localStorage.getItem(GAME_CONFIG_KEY)
-  if (!stored) return DEFAULT_GAME_CONFIG
+  if (!stored) {
+    return DEFAULT_GAME_CONFIG
+  }
 
   try {
     const config = JSON.parse(stored)

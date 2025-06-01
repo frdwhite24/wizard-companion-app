@@ -30,7 +30,9 @@
     const positions = new Map<string, number>()
     let currentPosition = 1
     const sortedPlayers = [...scores].sort((a, b) => {
-      if (b.score !== a.score) return b.score - a.score
+      if (b.score !== a.score) {
+        return b.score - a.score
+      }
       return b.correctGuesses - a.correctGuesses
     })
 
@@ -61,7 +63,7 @@
   </header>
   <main class="container">
     <div class="games">
-      {#each gameHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) as game}
+      {#each gameHistory.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()) as game (game.id)}
         {@const gameRecords = calculateGameRecords(game)}
         <article>
           <header>
@@ -72,7 +74,7 @@
           </header>
 
           <div class="scores">
-            {#each getSortedPlayers(game) as player}
+            {#each getSortedPlayers(game) as player (player)}
               {@const position = getPlayerPositions(game.scores).get(
                 player.player,
               )}

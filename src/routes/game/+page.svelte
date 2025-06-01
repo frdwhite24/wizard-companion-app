@@ -22,7 +22,9 @@
   let activeModal: ModalType = null
 
   function initializeRound() {
-    if (!gameState) return
+    if (!gameState) {
+      return
+    }
 
     if (!gameState.rounds[gameState.currentRound - 1]) {
       gameState.rounds[gameState.currentRound - 1] = {
@@ -42,10 +44,13 @@
   }
 
   function handlePopState() {
-    if (!gameState) return
+    if (!gameState) {
+      return
+    }
 
     const urlRound = parseInt($page.url.searchParams.get('round') ?? '1')
     const urlStage =
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       ($page.url.searchParams.get('stage') as GameState['stage']) ?? 'guess'
 
     // Going back from first stage of first round -> go home
@@ -141,12 +146,16 @@
   }
 
   function canProceed(): boolean {
-    if (!gameState) return false
+    if (!gameState) {
+      return false
+    }
 
     switch (gameState.stage) {
       case 'guess': {
         const currentRound = gameState.rounds[gameState.currentRound - 1]
-        if (!currentRound) return false
+        if (!currentRound) {
+          return false
+        }
 
         // All players must have guessed
         const allGuessed = gameState.players.every(
@@ -190,7 +199,9 @@
   }
 
   function proceed(): void {
-    if (!gameState) return
+    if (!gameState) {
+      return
+    }
 
     switch (gameState.stage) {
       case 'guess':
@@ -226,10 +237,14 @@
   }
 
   function handleGuessChange(player: string, value: number) {
-    if (!gameState) return
+    if (!gameState) {
+      return
+    }
 
     const currentRound = gameState.rounds[gameState.currentRound - 1]
-    if (!currentRound) return
+    if (!currentRound) {
+      return
+    }
 
     if (value >= 0) {
       currentRound.guesses = {
@@ -271,10 +286,14 @@
 
   // Add tricks state handling
   function handleTrickChange(player: string, value: number) {
-    if (!gameState) return
+    if (!gameState) {
+      return
+    }
 
     const currentRound = gameState.rounds[gameState.currentRound - 1]
-    if (!currentRound) return
+    if (!currentRound) {
+      return
+    }
 
     if (value >= 0) {
       currentRound.tricks = {
@@ -324,7 +343,9 @@
   }
 
   function handleBack() {
-    if (!gameState) return
+    if (!gameState) {
+      return
+    }
 
     const stages: GameState['stage'][] = ['guess', 'result', 'scoreboard']
     const currentStageIndex = stages.indexOf(gameState.stage)

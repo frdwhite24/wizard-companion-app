@@ -24,7 +24,7 @@
 
 {#if players.length > 0}
   <div class="players">
-    {#each players as player, index}
+    {#each players as player, index (player)}
       <button class="outline" on:click={() => onRemovePlayer(index)}>
         {player} ✕
       </button>

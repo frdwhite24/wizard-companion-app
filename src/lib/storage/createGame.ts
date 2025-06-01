@@ -12,7 +12,9 @@ export interface CreateGameState {
 
 export function getCreateGameState(): CreateGameState | null {
   const stored = localStorage.getItem('createGame')
-  if (!stored) return null
+  if (!stored) {
+    return null
+  }
 
   try {
     const state = JSON.parse(stored)

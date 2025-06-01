@@ -72,23 +72,20 @@
       // Then by correct rounds
       return b.correctRounds - a.correctRounds
     })
-    .reduce(
-      (acc, result, index, array) => {
-        // Determine actual position considering ties
-        const position = array
-          .slice(0, index)
-          .filter(
-            (prev) =>
-              prev.cumulativeScore > result.cumulativeScore ||
-              (prev.cumulativeScore === result.cumulativeScore &&
-                prev.correctRounds > result.correctRounds),
-          ).length
+    .reduce<Record<string, number>>((acc, result, index, array) => {
+      // Determine actual position considering ties
+      const position = array
+        .slice(0, index)
+        .filter(
+          (prev) =>
+            prev.cumulativeScore > result.cumulativeScore ||
+            (prev.cumulativeScore === result.cumulativeScore &&
+              prev.correctRounds > result.correctRounds),
+        ).length
 
-        acc[result.player] = position
-        return acc
-      },
-      {} as Record<string, number>,
-    )
+      acc[result.player] = position
+      return acc
+    }, {})
 
   // Sort players by their current ranking
   $: orderedPlayers = [...players].sort((a, b) => {
@@ -119,7 +116,9 @@
     // Find if there are players with same score
     const hasSameScore = Object.entries(playerRankings).some(
       ([otherPlayer, _]) => {
-        if (otherPlayer === player) return false
+        if (otherPlayer === player) {
+          return false
+        }
         const otherScore = latestScores.find(
           (r) => r.player === otherPlayer,
         )?.cumulativeScore
@@ -162,7 +161,7 @@
   })
 
   // Calculate game records
-  $: gameHistory = loadGameHistory()
+  let gameHistory = loadGameHistory()
   $: currentGameSummary = {
     id: 'current',
     date: new Date().toISOString(),
@@ -202,8 +201,12 @@
   )
 
   function getRankText(value: number, allTimeValue: number): string {
-    if (value > allTimeValue) return 'New Record!'
-    if (value === allTimeValue) return 'Tied Record'
+    if (value > allTimeValue) {
+      return 'New Record!'
+    }
+    if (value === allTimeValue) {
+      return 'Tied Record'
+    }
     return `#${Math.round((value / allTimeValue) * 100)}% of Record`
   }
 </script>
@@ -216,12 +219,12 @@
       <thead>
         <tr>
           <th rowspan="2">Player</th>
-          {#each roundResults as round}
+          {#each roundResults as round (round.roundNumber)}
             <th colspan="4">Round {round.roundNumber}</th>
           {/each}
         </tr>
         <tr>
-          {#each roundResults as _}
+          {#each roundResults as round (round.roundNumber)}
             <th>Guess</th>
             <th>Won</th>
             <th>Round</th>
@@ -230,7 +233,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each orderedPlayers as player}
+        {#each orderedPlayers as player (player)}
           <tr>
             <td>
               <span class="player-cell">
@@ -240,7 +243,7 @@
                 >
               </span>
             </td>
-            {#each roundResults as round}
+            {#each roundResults as round (round.roundNumber)}
               {@const playerResult = round.results.find(
                 (r) => r.player === player,
               )}

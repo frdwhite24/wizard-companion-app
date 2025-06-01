@@ -39,12 +39,12 @@
   }
 
   // Memoize scores to prevent recalculation on every render
-  $: playerScores = orderedPlayers.reduce(
+  $: playerScores = orderedPlayers.reduce<Record<string, number>>(
     (acc, player) => {
       acc[player] = calculateAndSaveScore(player)
       return acc
     },
-    {} as Record<string, number>,
+    {},
   )
 </script>
 
@@ -72,7 +72,7 @@
 </div>
 
 <div class="players">
-  {#each orderedPlayers as player, index}
+  {#each orderedPlayers as player, index (player)}
     <div class="player-row">
       <div class="player-info">
         <p class="name pico-color-violet-500">{player}</p>

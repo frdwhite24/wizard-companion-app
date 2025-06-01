@@ -3,6 +3,7 @@ export function registerServiceWorker() {
     navigator.serviceWorker
       .register('/service-worker.js')
       .then((registration) => {
+        // eslint-disable-next-line no-console
         console.log('Service Worker registered with scope:', registration.scope)
       })
       .catch((error) => {

@@ -2,9 +2,9 @@
   import { loadGameHistory } from '$lib/gameHistory'
   import { calculateAllTimeRecords } from '$lib/utils/records'
 
-  $: gameHistory = loadGameHistory()
-  $: allTimeRecords = calculateAllTimeRecords(gameHistory)
-  $: allHistoricalScores = gameHistory
+  let gameHistory = loadGameHistory()
+  let allTimeRecords = calculateAllTimeRecords(gameHistory)
+  let allHistoricalScores = gameHistory
     .flatMap((game) =>
       game.scores.map((score) => ({
         player: score.player,
@@ -16,21 +16,21 @@
       })),
     )
     .sort((a, b) => a.date.getTime() - b.date.getTime())
-  $: highestScore =
+  let highestScore =
     allHistoricalScores.length > 0
       ? Math.max(...allHistoricalScores.map((s) => s.score))
       : 0
-  $: lowestScore =
+  let lowestScore =
     allHistoricalScores.length > 0
       ? Math.min(...allHistoricalScores.map((s) => s.score))
       : 0
-  $: highestScoreRecord = allHistoricalScores.find(
+  let highestScoreRecord = allHistoricalScores.find(
     (s) => s.score === highestScore,
   )
-  $: lowestScoreRecord = allHistoricalScores.find(
+  let lowestScoreRecord = allHistoricalScores.find(
     (s) => s.score === lowestScore,
   )
-  $: mostCorrectGuesses =
+  let mostCorrectGuesses =
     allHistoricalScores.length > 0
       ? Math.max(
           ...allHistoricalScores.map((s) =>
@@ -38,7 +38,7 @@
           ),
         )
       : 0
-  $: leastCorrectGuesses =
+  let leastCorrectGuesses =
     allHistoricalScores.length > 0
       ? Math.min(
           ...allHistoricalScores.map((s) =>
@@ -46,21 +46,22 @@
           ),
         )
       : 0
-  $: mostCorrectGuessesRecord = allHistoricalScores.find(
+  let mostCorrectGuessesRecord = allHistoricalScores.find(
     (s) =>
       Math.round((s.correctGuesses / s.totalRounds) * 100) ===
       mostCorrectGuesses,
   )
-  $: leastCorrectGuessesRecord = allHistoricalScores.find(
+  let leastCorrectGuessesRecord = allHistoricalScores.find(
     (s) =>
       Math.round((s.correctGuesses / s.totalRounds) * 100) ===
       leastCorrectGuesses,
   )
 
   // New round-by-round records
-  $: allRoundScores = gameHistory
+  let allRoundScores = gameHistory
     .filter((game) => game.roundScores) // Only games with round-by-round data
     .flatMap((game) =>
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       game.roundScores!.flatMap((round) =>
         round.scores.map((score) => ({
           player: score.player,
@@ -74,18 +75,18 @@
     )
     .sort((a, b) => a.date.getTime() - b.date.getTime())
 
-  $: biggestRoundWin =
+  let biggestRoundWin =
     allRoundScores.length > 0
       ? Math.max(...allRoundScores.map((s) => s.score))
       : 0
-  $: biggestRoundLoss =
+  let biggestRoundLoss =
     allRoundScores.length > 0
       ? Math.min(...allRoundScores.map((s) => s.score))
       : 0
-  $: biggestRoundWinRecord = allRoundScores.find(
+  let biggestRoundWinRecord = allRoundScores.find(
     (s) => s.score === biggestRoundWin,
   )
-  $: biggestRoundLossRecord = allRoundScores.find(
+  let biggestRoundLossRecord = allRoundScores.find(
     (s) => s.score === biggestRoundLoss,
   )
 </script>

@@ -21,6 +21,27 @@ export default ts.config(
         ...globals.node,
       },
     },
+    rules: {
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
+        'warn',
+        { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+      ],
+      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      'brace-style': ['error', '1tbs', { allowSingleLine: false }],
+      curly: ['error', 'all'],
+      quotes: ['error', 'single', { avoidEscape: true }],
+      eqeqeq: ['error', 'always'],
+      'no-constant-binary-expression': 'error',
+      '@typescript-eslint/explicit-module-boundary-types': 'off',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        {
+          assertionStyle: 'never',
+        },
+      ],
+    },
   },
   {
     files: ['**/*.svelte'],

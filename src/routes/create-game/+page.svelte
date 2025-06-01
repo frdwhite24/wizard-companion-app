@@ -97,7 +97,9 @@
   }
 
   function movePlayer(index: number, direction: 'up' | 'down') {
-    if (!gameState) return
+    if (!gameState) {
+      return
+    }
 
     const newPlayers = [...gameState.players]
     const targetIndex = direction === 'up' ? index - 1 : index + 1

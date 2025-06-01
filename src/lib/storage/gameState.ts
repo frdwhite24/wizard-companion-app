@@ -22,7 +22,9 @@ const STORAGE_KEY = 'gameState'
 export function getGameState(): GameState | null {
   try {
     const stored = localStorage.getItem(STORAGE_KEY)
-    if (!stored) return null
+    if (!stored) {
+      return null
+    }
     const state = JSON.parse(stored)
     return {
       ...state,

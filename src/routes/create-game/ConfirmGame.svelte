@@ -15,7 +15,7 @@
   <p>Playing with {players.length} players over {rounds} rounds</p>
 </div>
 <div class="player-list">
-  {#each players as player, index}
+  {#each players as player, index (player)}
     <div class="player-row">
       <p>
         {player}

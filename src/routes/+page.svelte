@@ -8,10 +8,10 @@
   import { onMount } from 'svelte'
   import { preloadData } from '$app/navigation'
 
-  $: gameInProgress = getGameState() !== null
-  $: setupInProgress = getCreateGameState() !== null
-  $: gameHistory = loadGameHistory()
-  $: hasHistory = gameHistory.length > 0
+  let gameInProgress = getGameState() !== null
+  let setupInProgress = getCreateGameState() !== null
+  let gameHistory = loadGameHistory()
+  let hasHistory = gameHistory.length > 0
 
   function startNewGame() {
     clearCreateGameState()
