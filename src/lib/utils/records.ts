@@ -137,6 +137,7 @@ export function calculateAllTimeRecords(games: GameSummary[]): GameRecords {
   let streakPlayer = ''
   let streakDate: Date | null = null
   const streaks: Record<string, number> = {}
+  let currentGameDate: string | null = null
 
   // Sort allRoundScores by date and round to ensure order
   const sortedAllRoundScores = [...allRoundScores].sort((a, b) => {
@@ -148,6 +149,16 @@ export function calculateAllTimeRecords(games: GameSummary[]): GameRecords {
   })
 
   sortedAllRoundScores.forEach((score) => {
+    const scoreDate = score.date?.toISOString() ?? ''
+
+    // Reset streaks when moving to a new game
+    if (scoreDate !== currentGameDate) {
+      currentGameDate = scoreDate
+      Object.keys(streaks).forEach((player) => {
+        streaks[player] = 0
+      })
+    }
+
     const prevStreak = streaks[score.player] ?? 0
     if (score.correctGuess) {
       const newStreak = prevStreak + 1
