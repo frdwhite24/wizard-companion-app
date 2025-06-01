@@ -8,6 +8,7 @@
   export let config: GameConfig
 
   $: dealerIndex = (currentRound - 1) % players.length
+  $: dealer = players[dealerIndex]
   $: firstGuesserIndex =
     dealerIndex === players.length - 1 ? 0 : dealerIndex + 1
 
@@ -52,30 +53,28 @@
     }
     return getForbiddenMessage(player)
   }
-
-  function getMessageClass(player: string): string {
-    return player === orderedPlayers[0] ? 'info' : 'warning'
-  }
 </script>
 
-<h1>Make your guesses</h1>
-<p>Each player guesses how many tricks they'll win</p>
-
+<h1>Deal and guess</h1>
+<p>Deal the cards to each player and guess how many tricks they'll win</p>
 <div class="status">
   <div class="validation {isExact ? 'exact' : 'pending'}">
     {totalGuesses} of {currentRound} trick{currentRound === 1 ? '' : 's'} claimed
   </div>
 </div>
-
 <div class="players">
   {#each orderedPlayers as player}
     <div class="player-row">
       <div class="player-info">
         <p>{player}</p>
+        {#if player === dealer}
+          <small class="info">
+            Deals {currentRound}
+            {currentRound === 1 ? 'card' : 'cards'} each
+          </small>
+        {/if}
         {#if getPlayerMessage(player) !== null}
-          <small class={getMessageClass(player)}
-            >{getPlayerMessage(player)}</small
-          >
+          <small class="info">{getPlayerMessage(player)}</small>
         {/if}
       </div>
       <div class="guess-controls">
@@ -94,6 +93,15 @@
     </div>
   {/each}
 </div>
+<details>
+  <summary class="summary-text">What does the trump mean?</summary>
+  <p>
+    If there are no cards left or a jester is turned there is no trump suit,
+    only the wizards are trump.
+  </p>
+  <br />
+  <p>If a wizard is turned the dealer picks a trump suit.</p>
+</details>
 
 <style>
   .players {
@@ -140,12 +148,9 @@
     font-size: 1.2rem;
   }
 
-  .warning {
-    font-size: 0.8rem;
-  }
-
   .info {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
+    line-height: 0.7rem;
   }
 
   .status {
@@ -170,5 +175,21 @@
   .validation.exact {
     background: rgba(52, 211, 153, 0.1);
     color: rgb(52, 211, 153);
+  }
+
+  details {
+    border: 1px solid var(--pico-primary-border);
+    padding: 16px;
+    border-radius: var(--pico-border-radius);
+    margin-top: 16px;
+  }
+
+  details p {
+    margin-bottom: 0;
+  }
+
+  details[open] > summary:not([role]):not(:focus),
+  details summary {
+    color: var(--pico-accordion-active-summary-color);
   }
 </style>

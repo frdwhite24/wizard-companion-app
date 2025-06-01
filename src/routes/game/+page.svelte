@@ -7,7 +7,6 @@
     getGameState,
     setGameState,
   } from '$lib/storage/gameState'
-  import DealStage from './DealStage.svelte'
   import GuessStage from './GuessStage.svelte'
   import PlayStage from './PlayStage.svelte'
   import ResultsStage from './ResultsStage.svelte'
@@ -48,13 +47,13 @@
 
     const urlRound = parseInt($page.url.searchParams.get('round') ?? '1')
     const urlStage =
-      ($page.url.searchParams.get('stage') as GameState['stage']) ?? 'deal'
+      ($page.url.searchParams.get('stage') as GameState['stage']) ?? 'guess'
 
     // Going back from first stage of first round -> go home
     if (
       urlRound === 1 &&
-      urlStage === 'deal' &&
-      (gameState.currentRound > 1 || gameState.stage !== 'deal')
+      urlStage === 'guess' &&
+      (gameState.currentRound > 1 || gameState.stage !== 'guess')
     ) {
       goto('/')
       return
@@ -66,7 +65,7 @@
 
     if (urlStage !== gameState.stage) {
       // Moving backwards within the same round
-      const stages: GameState['stage'][] = ['deal', 'guess', 'play', 'result']
+      const stages: GameState['stage'][] = ['guess', 'play', 'result']
       const currentIndex = stages.indexOf(gameState.stage)
       const targetIndex = stages.indexOf(urlStage)
 
@@ -129,8 +128,6 @@
     const isFinalRound = totalRounds === currentRound
     const isSecondToLastRound = totalRounds - 1 === currentRound
     switch (stage) {
-      case 'deal':
-        return 'Start guessing'
       case 'guess':
         return 'Start playing'
       case 'play':
@@ -150,8 +147,6 @@
     if (!gameState) return false
 
     switch (gameState.stage) {
-      case 'deal':
-        return true
       case 'guess': {
         const currentRound = gameState.rounds[gameState.currentRound - 1]
         if (!currentRound) return false
@@ -203,12 +198,8 @@
     if (!gameState) return
 
     switch (gameState.stage) {
-      case 'deal':
-        initializeRound()
-        gameState.stage = 'guess'
-        updateURL(gameState.currentRound, 'guess')
-        break
       case 'guess':
+        initializeRound()
         gameState.stage = 'play'
         updateURL(gameState.currentRound, 'play')
         break
@@ -234,8 +225,8 @@
           handleRematch()
         } else {
           gameState.currentRound += 1
-          gameState.stage = 'deal'
-          updateURL(gameState.currentRound, 'deal')
+          gameState.stage = 'guess'
+          updateURL(gameState.currentRound, 'guess')
         }
         break
     }
@@ -271,8 +262,6 @@
 
   function getStageName(stage: GameState['stage']): string {
     switch (stage) {
-      case 'deal':
-        return 'Dealing'
       case 'guess':
         return 'Guessing'
       case 'play':
@@ -289,10 +278,7 @@
     : 0
 
   $: stageProgress = gameState
-    ? ({ deal: 1, guess: 2, play: 3, result: 4, scoreboard: 5 }[
-        gameState.stage
-      ] /
-        5) *
+    ? ({ guess: 1, play: 2, result: 3, scoreboard: 4 }[gameState.stage] / 4) *
       100
     : 0
 
@@ -338,7 +324,7 @@
         players: gameState.players,
         currentRound: 1,
         totalRounds: gameState.totalRounds,
-        stage: 'deal',
+        stage: 'guess',
         rounds: [],
         lastUpdated: Date.now(),
         config: gameState.config, // Keep the same config for rematch
@@ -346,7 +332,7 @@
 
       // Update both state and URL synchronously
       setGameState(newGame)
-      goto('/game?round=1&stage=deal', { replaceState: true })
+      goto('/game?round=1&stage=guess', { replaceState: true })
     }
   }
 
@@ -354,7 +340,6 @@
     if (!gameState) return
 
     const stages: GameState['stage'][] = [
-      'deal',
       'guess',
       'play',
       'result',
@@ -403,12 +388,7 @@
 
   <main class="container">
     {#if gameState}
-      {#if gameState.stage === 'deal'}
-        <DealStage
-          currentRound={gameState.currentRound}
-          players={gameState.players}
-        />
-      {:else if gameState.stage === 'guess'}
+      {#if gameState.stage === 'guess'}
         <GuessStage
           currentRound={gameState.currentRound}
           players={gameState.players}
@@ -469,7 +449,7 @@
       {/if}
 
       <div class="buttons">
-        {#if gameState.currentRound === 1 && gameState.stage === 'deal'}
+        {#if gameState.currentRound === 1 && gameState.stage === 'guess'}
           <button class="outline" on:click={() => (activeModal = 'stopGame')}>
             Stop game
           </button>

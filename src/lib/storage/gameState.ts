@@ -12,7 +12,7 @@ export type GameState = {
   totalRounds: number
   currentRound: number
   rounds: Round[]
-  stage: 'deal' | 'guess' | 'play' | 'result' | 'scoreboard'
+  stage: 'guess' | 'play' | 'result' | 'scoreboard'
   lastUpdated: number
   config: GameConfig
 }

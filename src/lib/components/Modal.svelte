@@ -35,11 +35,6 @@
   }
 </script>
 
-// Requirements: - Title prop - Content/message prop - Primary action button
-text & callback - Secondary action button text & callback (optional) - Close
-button in header - Proper animations for open/close - Prevent background
-scrolling when open
-
 <dialog {open} on:click={handleBackdropClick}>
   <article>
     <h3>{title}</h3>

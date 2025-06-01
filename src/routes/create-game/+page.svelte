@@ -133,7 +133,7 @@
       players: gameState.players,
       totalRounds,
       currentRound: 1,
-      stage: 'deal',
+      stage: 'guess',
       rounds: [],
       lastUpdated: Date.now(),
       config: gameState.config,
