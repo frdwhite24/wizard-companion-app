@@ -281,7 +281,7 @@
     : 0
 
   $: stageProgress = gameState
-    ? ({ guess: 1, result: 2, scoreboard: 3 }[gameState.stage] / 3) * 100
+    ? { guess: 1, result: 2, scoreboard: 3 }[gameState.stage]
     : 0
 
   // Add tricks state handling
@@ -378,7 +378,11 @@
   <header class="container">
     <div class="progress-section">
       <progress value={gameProgress} max="100"></progress>
-      <progress value={stageProgress} max="100"></progress>
+      <div class="progress-stages">
+        <progress value="100" max="100"></progress>
+        <progress value={stageProgress >= 2 ? 100 : 0} max="100"></progress>
+        <progress value={stageProgress >= 3 ? 100 : 0} max="100"></progress>
+      </div>
     </div>
     {#if gameState}
       <small>
@@ -530,6 +534,12 @@
     flex-direction: column;
     gap: 0.5rem;
     margin-bottom: 0.5rem;
+  }
+
+  .progress-stages {
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
   }
 
   footer {
