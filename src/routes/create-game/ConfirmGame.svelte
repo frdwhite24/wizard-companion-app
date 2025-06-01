@@ -1,7 +1,7 @@
 <script lang="ts">
   import { calculateRounds } from '$lib/utils/gameCalculations'
   import { getPlayerRoles } from '$lib/data/playerRoles'
-  import type { GameConfig } from '$lib/types/gameConfig'
+  import type { GameConfig } from '$lib/utils/types/gameConfig'
 
   export let players: string[]
   export let config: GameConfig

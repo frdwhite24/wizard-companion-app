@@ -1,7 +1,9 @@
 <script lang="ts">
   import { loadGameHistory } from '$lib/gameHistory'
+  import { calculateAllTimeRecords } from '$lib/utils/records'
 
   $: gameHistory = loadGameHistory()
+  $: allTimeRecords = calculateAllTimeRecords(gameHistory)
   $: allHistoricalScores = gameHistory
     .flatMap((game) =>
       game.scores.map((score) => ({
@@ -86,63 +88,6 @@
   $: biggestRoundLossRecord = allRoundScores.find(
     (s) => s.score === biggestRoundLoss,
   )
-
-  // Calculate longest correct streak
-  $: longestCorrectStreak = (() => {
-    if (allRoundScores.length === 0) return 0
-
-    let maxStreak = 0
-    let currentStreak = 0
-    let lastPlayer = ''
-
-    allRoundScores.forEach((score) => {
-      if (score.player === lastPlayer && score.correctGuess) {
-        currentStreak++
-        maxStreak = Math.max(maxStreak, currentStreak)
-      } else if (score.correctGuess) {
-        currentStreak = 1
-        maxStreak = Math.max(maxStreak, currentStreak)
-      } else {
-        currentStreak = 0
-      }
-      lastPlayer = score.player
-    })
-
-    return maxStreak
-  })()
-  $: longestStreakRecord = (() => {
-    if (longestCorrectStreak === 0) return null
-
-    let currentStreak = 0
-    let lastPlayer = ''
-    let streakStartDate: Date | null = null
-    let streakPlayer = ''
-
-    for (const score of allRoundScores) {
-      if (score.player === lastPlayer && score.correctGuess) {
-        currentStreak++
-        if (currentStreak === longestCorrectStreak) {
-          streakPlayer = score.player
-          streakStartDate = score.date
-          break
-        }
-      } else if (score.correctGuess) {
-        currentStreak = 1
-        if (currentStreak === longestCorrectStreak) {
-          streakPlayer = score.player
-          streakStartDate = score.date
-          break
-        }
-      } else {
-        currentStreak = 0
-      }
-      lastPlayer = score.player
-    }
-
-    return streakStartDate
-      ? { player: streakPlayer, date: streakStartDate }
-      : null
-  })()
 </script>
 
 <div class="page">
@@ -204,10 +149,15 @@
       </div>
       <div class="record-card high">
         <div class="record-label">Longest Correct Streak</div>
-        <div class="record-value">{longestCorrectStreak}</div>
+        <div class="record-value">{allTimeRecords.longestStreak.value}</div>
         <div class="record-details">
-          {#if longestStreakRecord}
-            {longestStreakRecord.player} on {longestStreakRecord.date.toLocaleDateString()}
+          {#if allTimeRecords.longestStreak.player}
+            {allTimeRecords.longestStreak.player}
+            {#if allTimeRecords.longestStreak.date}
+              on {new Date(
+                allTimeRecords.longestStreak.date,
+              ).toLocaleDateString()}
+            {/if}
           {:else}
             No data available
           {/if}

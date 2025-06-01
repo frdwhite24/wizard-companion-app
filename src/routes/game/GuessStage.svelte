@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { GameConfig } from '$lib/types/gameConfig'
+  import type { GameConfig } from '$lib/utils/types/gameConfig'
   import { onMount } from 'svelte'
 
   export let currentRound: number

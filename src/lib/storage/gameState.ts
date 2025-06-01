@@ -1,5 +1,5 @@
-import type { GameConfig } from '$lib/types/gameConfig'
-import { DEFAULT_GAME_CONFIG } from '$lib/types/gameConfig'
+import type { GameConfig } from '$lib/utils/types/gameConfig'
+import { DEFAULT_GAME_CONFIG } from '$lib/utils/types/gameConfig'
 
 export interface Round {
   guesses: Record<string, number>

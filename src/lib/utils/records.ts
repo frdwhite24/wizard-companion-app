@@ -85,10 +85,12 @@ export function calculateGameRecords(game: GameSummary): GameRecords {
     bestAccuracy: {
       player: bestAccuracyScore.player,
       value: bestAccuracyScore.accuracy,
+      date: new Date(game.date),
     },
     worstAccuracy: {
       player: worstAccuracyScore.player,
       value: worstAccuracyScore.accuracy,
+      date: new Date(game.date),
     },
     biggestRoundWin: roundScores.reduce(
       (max, curr) => (curr.value > max.value ? curr : max),

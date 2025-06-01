@@ -15,7 +15,7 @@
   import ConfirmGame from './ConfirmGame.svelte'
   import { calculateRounds } from '$lib/utils/gameCalculations'
   import { setGameState } from '$lib/storage/gameState'
-  import { DEFAULT_GAME_CONFIG } from '$lib/types/gameConfig'
+  import { DEFAULT_GAME_CONFIG } from '$lib/utils/types/gameConfig'
   import confetti from 'canvas-confetti'
 
   let gameState: CreateGameState = {
