@@ -35,29 +35,32 @@ export function calculateGameRecords(game: GameSummary): GameRecords {
       })),
     ) ?? []
 
-  // Calculate longest streak
+  // Calculate longest streak (per player)
   let maxStreak = 0
   let streakPlayer = ''
-  let currentStreak = 0
-  let lastPlayer = ''
+  let streakDate: Date | null = null
+  const streaks: Record<string, number> = {}
 
-  roundScores.forEach((score) => {
-    if (score.player === lastPlayer && score.correctGuess) {
-      currentStreak++
-      if (currentStreak > maxStreak) {
-        maxStreak = currentStreak
+  // Sort roundScores by round to ensure order
+  const sortedRoundScores = [...roundScores].sort((a, b) => {
+    const aRound = typeof a.round === 'number' ? a.round : 0
+    const bRound = typeof b.round === 'number' ? b.round : 0
+    return aRound - bRound
+  })
+
+  sortedRoundScores.forEach((score) => {
+    const prevStreak = streaks[score.player] ?? 0
+    if (score.correctGuess) {
+      const newStreak = prevStreak + 1
+      streaks[score.player] = newStreak
+      if (newStreak > maxStreak) {
+        maxStreak = newStreak
         streakPlayer = score.player
-      }
-    } else if (score.correctGuess) {
-      currentStreak = 1
-      if (currentStreak > maxStreak) {
-        maxStreak = currentStreak
-        streakPlayer = score.player
+        streakDate = new Date(game.date)
       }
     } else {
-      currentStreak = 0
+      streaks[score.player] = 0
     }
-    lastPlayer = score.player
   })
 
   const bestAccuracyScore = scores.reduce(
@@ -98,6 +101,7 @@ export function calculateGameRecords(game: GameSummary): GameRecords {
     longestStreak: {
       player: streakPlayer,
       value: maxStreak,
+      date: streakDate,
     },
   }
 }
@@ -126,32 +130,34 @@ export function calculateAllTimeRecords(games: GameSummary[]): GameRecords {
       ),
     )
 
-  // Calculate longest streak
+  // Calculate longest streak (per player)
   let maxStreak = 0
   let streakPlayer = ''
   let streakDate: Date | null = null
-  let currentStreak = 0
-  let lastPlayer = ''
+  const streaks: Record<string, number> = {}
 
-  allRoundScores.forEach((score) => {
-    if (score.player === lastPlayer && score.correctGuess) {
-      currentStreak++
-      if (currentStreak > maxStreak) {
-        maxStreak = currentStreak
-        streakPlayer = score.player
-        streakDate = score.date
-      }
-    } else if (score.correctGuess) {
-      currentStreak = 1
-      if (currentStreak > maxStreak) {
-        maxStreak = currentStreak
+  // Sort allRoundScores by date and round to ensure order
+  const sortedAllRoundScores = [...allRoundScores].sort((a, b) => {
+    const dateDiff = (a.date?.getTime?.() ?? 0) - (b.date?.getTime?.() ?? 0)
+    if (dateDiff !== 0) return dateDiff
+    const aRound = typeof a.round === 'number' ? a.round : 0
+    const bRound = typeof b.round === 'number' ? b.round : 0
+    return aRound - bRound
+  })
+
+  sortedAllRoundScores.forEach((score) => {
+    const prevStreak = streaks[score.player] ?? 0
+    if (score.correctGuess) {
+      const newStreak = prevStreak + 1
+      streaks[score.player] = newStreak
+      if (newStreak > maxStreak) {
+        maxStreak = newStreak
         streakPlayer = score.player
         streakDate = score.date
       }
     } else {
-      currentStreak = 0
+      streaks[score.player] = 0
     }
-    lastPlayer = score.player
   })
 
   const bestAccuracyScore = allScores.reduce(

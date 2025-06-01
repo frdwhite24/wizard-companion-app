@@ -67,7 +67,7 @@
     {/if}
     {#if hasHistory}
       <a href="/history" role="button" class="outline">Game History</a>
-      <a href="/records" role="button" class="outline">Records</a>
+      <a href="/records" role="button" class="outline">Hall of Fame</a>
     {/if}
     <button on:click={startNewGame} class="primary">Start new game</button>
   </footer>

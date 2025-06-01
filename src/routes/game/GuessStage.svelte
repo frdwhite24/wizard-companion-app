@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { GameConfig } from '$lib/types/gameConfig'
+  import { onMount } from 'svelte'
 
   export let currentRound: number
   export let players: string[]
   export let guesses: Record<string, number>
   export let onGuessChange: (player: string, value: number) => void
   export let config: GameConfig
+  export let initializeRound: () => void
 
   $: dealerIndex = (currentRound - 1) % players.length
   $: dealer = players[dealerIndex]
@@ -56,6 +58,10 @@
     }
     return getForbiddenMessage(player)
   }
+
+  onMount(() => {
+    initializeRound()
+  })
 </script>
 
 <h1>Deal and guess</h1>

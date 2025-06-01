@@ -194,7 +194,6 @@
 
     switch (gameState.stage) {
       case 'guess':
-        initializeRound()
         gameState.stage = 'result'
         updateURL(gameState.currentRound, 'result')
         break
@@ -378,6 +377,7 @@
           guesses={currentGuesses}
           onGuessChange={handleGuessChange}
           config={gameState.config}
+          {initializeRound}
         />
       {:else if gameState.stage === 'result'}
         <ResultsStage

@@ -109,66 +109,84 @@
           <details class="game-stats">
             <summary>Game Stats</summary>
             <div class="records">
-              <div class="record-card high">
-                <div class="record-label">Top Score</div>
-                <div class="record-value">{gameRecords.highestScore.value}</div>
-                <div class="record-details">
-                  {gameRecords.highestScore.player}
+              <div class="card-wrapper">
+                <div class="record-card high">
+                  <div class="record-label">Top Score</div>
+                  <div class="record-value">
+                    {gameRecords.highestScore.value}
+                  </div>
+                  <div class="record-details">
+                    {gameRecords.highestScore.player}
+                  </div>
                 </div>
               </div>
-              <div class="record-card low">
-                <div class="record-label">Lowest Score</div>
-                <div class="record-value">{gameRecords.lowestScore.value}</div>
-                <div class="record-details">
-                  {gameRecords.lowestScore.player}
+              <div class="card-wrapper">
+                <div class="record-card low">
+                  <div class="record-label">Lowest Score</div>
+                  <div class="record-value">
+                    {gameRecords.lowestScore.value}
+                  </div>
+                  <div class="record-details">
+                    {gameRecords.lowestScore.player}
+                  </div>
                 </div>
               </div>
-              <div class="record-card high">
-                <div class="record-label">Best Guess Accuracy</div>
-                <div class="record-value">
-                  {gameRecords.bestAccuracy.value}%
-                </div>
-                <div class="record-details">
-                  {gameRecords.bestAccuracy.player}
+              <div class="card-wrapper">
+                <div class="record-card high">
+                  <div class="record-label">Best Guess Accuracy</div>
+                  <div class="record-value">
+                    {gameRecords.bestAccuracy.value}%
+                  </div>
+                  <div class="record-details">
+                    {gameRecords.bestAccuracy.player}
+                  </div>
                 </div>
               </div>
-              <div class="record-card low">
-                <div class="record-label">Worst Guess Accuracy</div>
-                <div class="record-value">
-                  {gameRecords.worstAccuracy.value}%
-                </div>
-                <div class="record-details">
-                  {gameRecords.worstAccuracy.player}
+              <div class="card-wrapper">
+                <div class="record-card low">
+                  <div class="record-label">Worst Guess Accuracy</div>
+                  <div class="record-value">
+                    {gameRecords.worstAccuracy.value}%
+                  </div>
+                  <div class="record-details">
+                    {gameRecords.worstAccuracy.player}
+                  </div>
                 </div>
               </div>
               {#if game.roundScores}
-                <div class="record-card high">
-                  <div class="record-label">Biggest Round Win</div>
-                  <div class="record-value">
-                    {gameRecords.biggestRoundWin.value}
-                  </div>
-                  <div class="record-details">
-                    {gameRecords.biggestRoundWin.player} in round {gameRecords
-                      .biggestRoundWin.round}
-                  </div>
-                </div>
-                <div class="record-card low">
-                  <div class="record-label">Biggest Round Loss</div>
-                  <div class="record-value">
-                    {gameRecords.biggestRoundLoss.value}
-                  </div>
-                  <div class="record-details">
-                    {gameRecords.biggestRoundLoss.player} in round {gameRecords
-                      .biggestRoundLoss.round}
+                <div class="card-wrapper">
+                  <div class="record-card high">
+                    <div class="record-label">Biggest Round Win</div>
+                    <div class="record-value">
+                      {gameRecords.biggestRoundWin.value}
+                    </div>
+                    <div class="record-details">
+                      {gameRecords.biggestRoundWin.player} in round {gameRecords
+                        .biggestRoundWin.round}
+                    </div>
                   </div>
                 </div>
-                <div class="record-card high">
-                  <div class="record-label">Longest Correct Streak</div>
-                  <div class="record-value">
-                    {gameRecords.longestStreak.value}
+                <div class="card-wrapper">
+                  <div class="record-card low">
+                    <div class="record-label">Biggest Round Loss</div>
+                    <div class="record-value">
+                      {gameRecords.biggestRoundLoss.value}
+                    </div>
+                    <div class="record-details">
+                      {gameRecords.biggestRoundLoss.player} in round {gameRecords
+                        .biggestRoundLoss.round}
+                    </div>
                   </div>
-                  <div class="record-details">
-                    {gameRecords.longestStreak.player}
+                </div>
+                <div class="card-wrapper">
+                  <div class="record-card high">
+                    <div class="record-label">Longest Correct Streak</div>
+                    <div class="record-value">
+                      {gameRecords.longestStreak.value}
+                    </div>
+                    <div class="record-details">
+                      {gameRecords.longestStreak.player}
+                    </div>
                   </div>
                 </div>
               {/if}
@@ -305,10 +323,12 @@
   }
 
   .game-stats {
-    margin: 1rem 0;
-    border: 1px solid var(--pico-primary-border);
+    font-size: 0.8rem;
+    color: rgb(147, 51, 234);
+    margin: 16px 0;
     padding: 16px;
     border-radius: var(--pico-border-radius);
+    background: rgba(147, 51, 234, 0.1);
   }
 
   .game-stats summary {
@@ -323,10 +343,16 @@
     margin-top: 1rem;
   }
 
+  .card-wrapper {
+    background-color: white;
+    border-radius: var(--pico-border-radius);
+  }
+
   .record-card {
     padding: 1rem;
     border-radius: var(--pico-border-radius);
     text-align: center;
+    height: 100%;
   }
 
   .record-card.high {
