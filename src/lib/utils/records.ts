@@ -4,7 +4,7 @@ export interface GameRecord {
   player: string
   value: number
   date?: Date | null
-  round?: number
+  round?: number | undefined
 }
 
 export interface GameRecords {
@@ -32,6 +32,7 @@ export function calculateGameRecords(game: GameSummary): GameRecords {
         value: score.score,
         correctGuess: score.correctGuess,
         round: round.round,
+        date: new Date(game.date),
       })),
     ) ?? []
 
@@ -108,112 +109,74 @@ export function calculateGameRecords(game: GameSummary): GameRecords {
   }
 }
 
-export function calculateAllTimeRecords(games: GameSummary[]): GameRecords {
-  const allScores = games.flatMap((game) =>
-    game.scores.map((score) => ({
-      player: score.player,
-      value: score.score,
-      accuracy: Math.round((score.correctGuesses / game.rounds) * 100),
-      date: new Date(game.date),
-    })),
-  )
-
-  const allRoundScores = games
-    .filter((game) => game.roundScores)
-    .flatMap((game) =>
-      game.roundScores!.flatMap((round) =>
-        round.scores.map((score) => ({
-          player: score.player,
-          value: score.score,
-          correctGuess: score.correctGuess,
-          date: new Date(game.date),
-          round: round.round,
-        })),
-      ),
-    )
-
-  // Calculate longest streak (per player)
-  let maxStreak = 0
-  let streakPlayer = ''
-  let streakDate: Date | null = null
-  const streaks: Record<string, number> = {}
-  let currentGameDate: string | null = null
-
-  // Sort allRoundScores by date and round to ensure order
-  const sortedAllRoundScores = [...allRoundScores].sort((a, b) => {
-    const dateDiff = (a.date?.getTime?.() ?? 0) - (b.date?.getTime?.() ?? 0)
-    if (dateDiff !== 0) return dateDiff
-    const aRound = typeof a.round === 'number' ? a.round : 0
-    const bRound = typeof b.round === 'number' ? b.round : 0
-    return aRound - bRound
-  })
-
-  sortedAllRoundScores.forEach((score) => {
-    const scoreDate = score.date?.toISOString() ?? ''
-
-    // Reset streaks when moving to a new game
-    if (scoreDate !== currentGameDate) {
-      currentGameDate = scoreDate
-      Object.keys(streaks).forEach((player) => {
-        streaks[player] = 0
-      })
-    }
-
-    const prevStreak = streaks[score.player] ?? 0
-    if (score.correctGuess) {
-      const newStreak = prevStreak + 1
-      streaks[score.player] = newStreak
-      if (newStreak > maxStreak) {
-        maxStreak = newStreak
-        streakPlayer = score.player
-        streakDate = score.date
+export function calculateAllTimeRecordsFromGameRecords(
+  gameRecords: GameRecords[],
+): GameRecords {
+  // Helper function to find the record with the highest/lowest value
+  const findExtremeRecord = (
+    records: GameRecord[],
+    isMax: boolean,
+  ): GameRecord => {
+    if (records.length === 0) {
+      // Return a default record with all possible properties
+      return {
+        player: '',
+        value: isMax ? -Infinity : Infinity,
+        date: null,
+        round: undefined,
       }
-    } else {
-      streaks[score.player] = 0
     }
-  })
+    const firstRecord = records[0]
+    if (!firstRecord) {
+      return {
+        player: '',
+        value: isMax ? -Infinity : Infinity,
+        date: null,
+        round: undefined,
+      }
+    }
+    return records.reduce((extreme, curr) => {
+      if (isMax) {
+        return curr.value > extreme.value ? curr : extreme
+      }
+      return curr.value < extreme.value ? curr : extreme
+    }, firstRecord)
+  }
 
-  const bestAccuracyScore = allScores.reduce(
-    (max, curr) => (curr.accuracy > max.accuracy ? curr : max),
-    allScores[0] || { player: '', value: 0, accuracy: -Infinity, date: null },
+  // Collect all records of each type
+  const highestScores = gameRecords.map((record) => record.highestScore)
+  const lowestScores = gameRecords.map((record) => record.lowestScore)
+  const bestAccuracies = gameRecords.map((record) => record.bestAccuracy)
+  const worstAccuracies = gameRecords.map((record) => record.worstAccuracy)
+  const biggestRoundWins = gameRecords.map((record) => record.biggestRoundWin)
+  const biggestRoundLosses = gameRecords.map(
+    (record) => record.biggestRoundLoss,
   )
+  const longestStreaks = gameRecords.map((record) => record.longestStreak)
 
-  const worstAccuracyScore = allScores.reduce(
-    (min, curr) => (curr.accuracy < min.accuracy ? curr : min),
-    allScores[0] || { player: '', value: 0, accuracy: Infinity, date: null },
-  )
+  const highestScore = findExtremeRecord(highestScores, true)
+  const lowestScore = findExtremeRecord(lowestScores, false)
+  const bestAccuracy = findExtremeRecord(bestAccuracies, true)
+  const worstAccuracy = findExtremeRecord(worstAccuracies, false)
+  const biggestRoundWin = findExtremeRecord(biggestRoundWins, true)
+  const biggestRoundLoss = findExtremeRecord(biggestRoundLosses, false)
+  const longestStreak = findExtremeRecord(longestStreaks, true)
 
   return {
-    highestScore: allScores.reduce(
-      (max, curr) => (curr.value > max.value ? curr : max),
-      allScores[0] || { player: '', value: -Infinity },
-    ),
-    lowestScore: allScores.reduce(
-      (min, curr) => (curr.value < min.value ? curr : min),
-      allScores[0] || { player: '', value: Infinity },
-    ),
-    bestAccuracy: {
-      player: bestAccuracyScore.player,
-      value: bestAccuracyScore.accuracy,
-      date: bestAccuracyScore.date,
-    },
-    worstAccuracy: {
-      player: worstAccuracyScore.player,
-      value: worstAccuracyScore.accuracy,
-      date: worstAccuracyScore.date,
-    },
-    biggestRoundWin: allRoundScores.reduce(
-      (max, curr) => (curr.value > max.value ? curr : max),
-      allRoundScores[0] || { player: '', value: -Infinity },
-    ),
-    biggestRoundLoss: allRoundScores.reduce(
-      (min, curr) => (curr.value < min.value ? curr : min),
-      allRoundScores[0] || { player: '', value: Infinity },
-    ),
-    longestStreak: {
-      player: streakPlayer,
-      value: maxStreak,
-      date: streakDate,
-    },
+    highestScore,
+    lowestScore,
+    bestAccuracy,
+    worstAccuracy,
+    biggestRoundWin,
+    biggestRoundLoss,
+    longestStreak,
   }
+}
+
+export function calculateAllTimeRecords(games: GameSummary[]): GameRecords {
+  // Calculate records for each individual game
+  const individualGameRecords = games.map((game) => calculateGameRecords(game))
+
+  // Calculate all-time records from the individual game records
+  return calculateAllTimeRecordsFromGameRecords(individualGameRecords)
 }
