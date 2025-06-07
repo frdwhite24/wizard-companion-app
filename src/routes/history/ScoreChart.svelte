@@ -9,7 +9,7 @@
   const PLAYER_COLORS = [
     '#F0561D',
     '#f78c6b',
-    '#FFCC17',
+    '#DCA614',
     '#06d6a0',
     '#118ab2',
     '#876FD4',
@@ -101,12 +101,30 @@
       name: 'Round',
       nameLocation: 'middle',
       nameGap: 30,
+      splitLine: {
+        show: true,
+        interval: 0,
+        lineStyle: {
+          color: '#888', // soft grey
+          width: 1,
+          type: 'dashed',
+        },
+      },
+      boundaryGap: false,
     },
     yAxis: {
       type: 'value',
       name: 'Score',
       nameLocation: 'middle',
       nameGap: 40,
+      splitLine: {
+        show: true,
+        lineStyle: {
+          color: '#888', // soft grey
+          width: 1,
+          type: 'dashed',
+        },
+      },
     },
     series,
   }

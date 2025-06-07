@@ -354,7 +354,7 @@
   }
 
   .card-wrapper {
-    background-color: white;
+    background-color: var(--pico-background-color);
     border-radius: var(--pico-border-radius);
   }
 
