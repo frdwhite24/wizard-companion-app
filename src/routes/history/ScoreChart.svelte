@@ -1,0 +1,123 @@
+<script lang="ts">
+  import { onMount } from 'svelte'
+  import { init, type EChartsOption, type EChartsType } from 'echarts'
+  import type { GameSummary } from '$lib/gameHistory'
+
+  export let game: GameSummary
+
+  const BREAKPOINT = 900
+  const PLAYER_COLORS = [
+    '#5470c6',
+    '#91cc75',
+    '#fac858',
+    '#ee6666',
+    '#73c0de',
+    '#3ba272',
+    '#fc8452',
+    '#9a60b4',
+    '#ea7ccc',
+  ]
+
+  let myChart: EChartsType
+  let windowWidth = 0
+
+  function calculateCumulativeScores() {
+    if (!game.roundScores) return []
+
+    const playerScores = new Map<string, number[]>()
+    game.players.forEach((player) => {
+      playerScores.set(player, [0]) // Start with 0
+    })
+
+    game.roundScores.forEach((round) => {
+      round.scores.forEach((score) => {
+        const currentScores = playerScores.get(score.player) || []
+        const lastScore = currentScores[currentScores.length - 1] || 0
+        playerScores.set(score.player, [
+          ...currentScores,
+          lastScore + score.score,
+        ])
+      })
+    })
+
+    return Array.from(playerScores.entries()).map(([player, scores]) => ({
+      name: player,
+      type: 'line',
+      smooth: true,
+      data: scores,
+      color: PLAYER_COLORS[game.players.indexOf(player) % PLAYER_COLORS.length],
+    }))
+  }
+
+  $: series = calculateCumulativeScores()
+  $: xAxisData = game.roundScores
+    ? Array.from({ length: game.roundScores.length + 1 }, (_, i) => i)
+    : []
+
+  $: chartOption = {
+    tooltip: {
+      trigger: 'axis',
+      formatter: (params: any[]) => {
+        const round = params[0].dataIndex
+        return params
+          .map((param) => {
+            const player = param.seriesName
+            const score = param.value
+            return `${player}: ${score} (Round ${round})`
+          })
+          .join('<br/>')
+      },
+    },
+    legend: {
+      data: game.players,
+      bottom: 0,
+    },
+    grid: {
+      bottom: windowWidth < BREAKPOINT ? '20%' : '10%',
+      top: 60,
+      left: 5,
+      right: 5,
+      containLabel: true,
+    },
+    xAxis: {
+      type: 'category',
+      data: xAxisData,
+      name: 'Round',
+      nameLocation: 'middle',
+      nameGap: 30,
+    },
+    yAxis: {
+      type: 'value',
+      name: 'Score',
+      nameLocation: 'middle',
+      nameGap: 40,
+    },
+    series,
+  } satisfies EChartsOption
+
+  onMount(() => {
+    const chartDom = document.getElementById(`scoreChart-${game.id}`)
+    if (chartDom) {
+      myChart = init(chartDom)
+      myChart.setOption(chartOption)
+    }
+  })
+
+  $: {
+    if (myChart) {
+      myChart.setOption(chartOption)
+      myChart.resize()
+    }
+  }
+</script>
+
+<svelte:window bind:innerWidth={windowWidth} />
+
+<div id={`scoreChart-${game.id}`} class="chart" />
+
+<style>
+  .chart {
+    height: 400px;
+    width: 100%;
+  }
+</style>

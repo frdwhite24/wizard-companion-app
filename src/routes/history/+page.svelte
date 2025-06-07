@@ -3,6 +3,7 @@
   import type { GameSummary } from '$lib/gameHistory'
   import { goto } from '$app/navigation'
   import { calculateGameRecords } from '$lib/utils/records'
+  import ScoreChart from './ScoreChart.svelte'
 
   const gameHistory = loadGameHistory()
 
@@ -107,6 +108,13 @@
               </div>
             {/each}
           </div>
+
+          {#if game.roundScores}
+            <details class="score-chart">
+              <summary>Score Chart</summary>
+              <ScoreChart {game} />
+            </details>
+          {/if}
 
           <details class="game-stats">
             <summary>Game Stats</summary>
@@ -410,5 +418,19 @@
     main::-webkit-scrollbar {
       display: none;
     }
+  }
+
+  .score-chart {
+    font-size: 0.8rem;
+    color: rgb(147, 51, 234);
+    margin: 16px 0;
+    padding: 16px;
+    border-radius: var(--pico-border-radius);
+    background: rgba(147, 51, 234, 0.1);
+  }
+
+  .score-chart summary {
+    color: var(--pico-accordion-active-summary-color);
+    cursor: pointer;
   }
 </style>
