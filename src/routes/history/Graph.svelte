@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { init, type EChartsType, type TooltipComponentOption } from 'echarts'
+  import { init, type EChartsOption, type EChartsType } from 'echarts'
   import type { GameSummary } from '$lib/gameHistory'
 
   export let game: GameSummary
@@ -21,7 +21,9 @@
   let xAxisData = []
 
   function calculateCumulativeScores() {
-    if (!game.roundScores) return []
+    if (!game.roundScores) {
+      return []
+    }
 
     const playerScores = new Map<string, number[]>()
     game.players.forEach((player) => {
@@ -41,7 +43,7 @@
 
     return Array.from(playerScores.entries()).map(([player, scores]) => ({
       name: player,
-      type: 'line',
+      type: 'line' as const,
       smooth: true,
       data: scores,
       symbol: 'circle',
@@ -57,29 +59,29 @@
     ? Array.from({ length: game.roundScores.length + 1 }, (_, i) => i)
     : []
 
-  const tooltipFormatter: TooltipComponentOption['formatter'] = (
-    params: any,
-  ) => {
-    if (!Array.isArray(params) || !params.length) return ''
-    const round = params[0].dataIndex
-    // Sort params by score descending
-    const sorted = [...params].sort((a, b) => Number(b.value) - Number(a.value))
-    const lines = sorted.map((param) => {
-      const player = param.seriesName
-      const score = param.value
-      return `<div style=\"display:flex;justify-content:space-between;align-items:center;\"><span style=\"font-weight:bold;\">${player}</span><span style=\"font-family:monospace;margin-left:1em;\">${score}</span></div>`
-    })
-    return (
-      `<div style=\"font-weight:bold;font-size:1.1em;margin-bottom:0.5em;\">Round ${round}</div>` +
-      lines.join('')
-    )
-  }
-
-  let chartOption: any
+  let chartOption: EChartsOption
   $: chartOption = {
     tooltip: {
       trigger: 'axis',
-      formatter: tooltipFormatter,
+      formatter: (params) => {
+        if (!Array.isArray(params) || !params.length) {
+          return ''
+        }
+        const round = params[0]?.dataIndex
+        // Sort params by score descending
+        const sorted = [...params].sort(
+          (a, b) => Number(b.value) - Number(a.value),
+        )
+        const lines = sorted.map((param) => {
+          const player = param.seriesName
+          const score = param.value
+          return `<div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-weight:bold;">${player}</span><span style="font-family:monospace;margin-left:1em;">${score}</span></div>`
+        })
+        return (
+          `<div style="font-weight:bold;font-size:1.1em;margin-bottom:0.5em;">Round ${round}</div>` +
+          lines.join('')
+        )
+      },
     },
     legend: {
       data: game.players,
@@ -127,7 +129,7 @@
       },
     },
     series,
-  }
+  } satisfies EChartsOption
 
   onMount(() => {
     const chartDom = document.getElementById(`scoreChart-${game.id}`)
@@ -153,13 +155,5 @@
   .chart {
     height: 400px;
     width: 100%;
-  }
-  :root {
-    --player-color-1: #f0561d;
-    --player-color-2: #f78c6b;
-    --player-color-3: #ffcc17;
-    --player-color-4: #06d6a0;
-    --player-color-5: #118ab2;
-    --player-color-6: #073b4c;
   }
 </style>
