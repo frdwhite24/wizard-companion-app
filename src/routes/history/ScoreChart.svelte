@@ -7,15 +7,12 @@
 
   const BREAKPOINT = 900
   const PLAYER_COLORS = [
-    '#5470c6',
-    '#91cc75',
-    '#fac858',
-    '#ee6666',
-    '#73c0de',
-    '#3ba272',
-    '#fc8452',
-    '#9a60b4',
-    '#ea7ccc',
+    '#1f77b4', // blue
+    '#ff7f0e', // orange
+    '#2ca02c', // green
+    '#d62728', // red
+    '#9467bd', // purple
+    '#e377c2', // pink/magenta
   ]
 
   let myChart: EChartsType
@@ -68,9 +65,12 @@
     const lines = sorted.map((param) => {
       const player = param.seriesName
       const score = param.value
-      return `${player}: ${score}`
+      return `<div style=\"display:flex;justify-content:space-between;align-items:center;\"><span style=\"font-weight:bold;\">${player}</span><span style=\"font-family:monospace;margin-left:1em;\">${score}</span></div>`
     })
-    return `Round ${round}<br/>` + lines.join('<br/>')
+    return (
+      `<div style=\"font-weight:bold;font-size:1.1em;margin-bottom:0.5em;\">Round ${round}</div>` +
+      lines.join('')
+    )
   }
 
   let chartOption: any
@@ -82,6 +82,9 @@
     legend: {
       data: game.players,
       bottom: 0,
+      textStyle: {
+        color: 'var(--pico-color)',
+      },
     },
     grid: {
       bottom: windowWidth < BREAKPOINT ? '20%' : '10%',
