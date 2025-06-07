@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { init, type EChartsOption, type EChartsType } from 'echarts'
+  import { init, type EChartsType, type TooltipComponentOption } from 'echarts'
   import type { GameSummary } from '$lib/gameHistory'
 
   export let game: GameSummary
@@ -20,6 +20,8 @@
 
   let myChart: EChartsType
   let windowWidth = 0
+  let series = []
+  let xAxisData = []
 
   function calculateCumulativeScores() {
     if (!game.roundScores) return []
@@ -45,7 +47,9 @@
       type: 'line',
       smooth: true,
       data: scores,
-      color: PLAYER_COLORS[game.players.indexOf(player) % PLAYER_COLORS.length],
+      color:
+        PLAYER_COLORS[game.players.indexOf(player) % PLAYER_COLORS.length] ||
+        '#000',
     }))
   }
 
@@ -54,19 +58,26 @@
     ? Array.from({ length: game.roundScores.length + 1 }, (_, i) => i)
     : []
 
+  const tooltipFormatter: TooltipComponentOption['formatter'] = (
+    params: any,
+  ) => {
+    if (!Array.isArray(params) || !params.length) return ''
+    const round = params[0].dataIndex
+    // Sort params by score descending
+    const sorted = [...params].sort((a, b) => Number(b.value) - Number(a.value))
+    const lines = sorted.map((param) => {
+      const player = param.seriesName
+      const score = param.value
+      return `${player}: ${score}`
+    })
+    return `Round ${round}<br/>` + lines.join('<br/>')
+  }
+
+  let chartOption: any
   $: chartOption = {
     tooltip: {
       trigger: 'axis',
-      formatter: (params: any[]) => {
-        const round = params[0].dataIndex
-        return params
-          .map((param) => {
-            const player = param.seriesName
-            const score = param.value
-            return `${player}: ${score} (Round ${round})`
-          })
-          .join('<br/>')
-      },
+      formatter: tooltipFormatter,
     },
     legend: {
       data: game.players,
@@ -93,7 +104,7 @@
       nameGap: 40,
     },
     series,
-  } satisfies EChartsOption
+  }
 
   onMount(() => {
     const chartDom = document.getElementById(`scoreChart-${game.id}`)
@@ -113,7 +124,7 @@
 
 <svelte:window bind:innerWidth={windowWidth} />
 
-<div id={`scoreChart-${game.id}`} class="chart" />
+<div id={`scoreChart-${game.id}`} class="chart"></div>
 
 <style>
   .chart {
