@@ -3,7 +3,7 @@
   import type { GameSummary } from '$lib/gameHistory'
   import { goto } from '$app/navigation'
   import { calculateGameRecords } from '$lib/utils/records'
-  import Graph from './Graph.svelte'
+  import ScoreTimeline from '$lib/components/ScoreTimeline.svelte'
 
   const gameHistory = loadGameHistory()
 
@@ -112,7 +112,7 @@
           {#if game.roundScores}
             <details class="score-chart">
               <summary>Score Timeline</summary>
-              <Graph {game} />
+              <ScoreTimeline {game} />
             </details>
           {/if}
 

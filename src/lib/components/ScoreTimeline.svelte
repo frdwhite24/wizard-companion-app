@@ -17,8 +17,10 @@
 
   let myChart: EChartsType
   let windowWidth = 0
-  let series = []
-  let xAxisData = []
+  let series = calculateCumulativeScores()
+  $: xAxisData = game.roundScores
+    ? Array.from({ length: game.roundScores.length + 1 }, (_, i) => i)
+    : []
 
   function calculateCumulativeScores() {
     if (!game.roundScores) {
@@ -53,11 +55,6 @@
         '#000',
     }))
   }
-
-  $: series = calculateCumulativeScores()
-  $: xAxisData = game.roundScores
-    ? Array.from({ length: game.roundScores.length + 1 }, (_, i) => i)
-    : []
 
   let chartOption: EChartsOption
   $: chartOption = {
