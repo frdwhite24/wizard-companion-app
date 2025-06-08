@@ -8,11 +8,11 @@
   const BREAKPOINT = 900
   const PLAYER_COLORS = [
     '#F0561D',
-    '#f78c6b',
-    '#DCA614',
+    '#876FD4',
     '#06d6a0',
     '#118ab2',
-    '#876FD4',
+    '#f78c6b',
+    '#DCA614',
   ]
 
   let myChart: EChartsType
